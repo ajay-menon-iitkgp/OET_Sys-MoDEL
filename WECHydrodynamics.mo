@@ -1,7 +1,5 @@
-// Introduction to the WECHydrodynamics Library
-
 /*  Wave Energy Converter Hydrodynamics Library
-    Copyright (C) 2022  Sys-MoDEL
+    Copyright (C) 2022  Ajay Menon
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,15 +14,16 @@
     Your copy of the GNU General Public License can be viewed
     here <https://www.gnu.org/licenses/>.
 */
-   
+
+// Introduction to the WECHydrodynamics Library  
 /* Modelica library developed by Ajay Menon for Sys-MoDEL
    
-   This library features hydrodynamic omponents designed to be used for modeling Wave Energy Converters (WECs).
+   This library features hydrodynamic components designed to be used for symbolically modeling Wave Energy Converters (WECs).
    Currently, hydrodynamic toolboxes are limited to basic features that do not fully capture WEC behaviour.
-   This library is designed to be loaded into MapleSim for use with it's multibody dynamics solver.
+   This library is designed to be loaded into MapleSim or OMEdit, although the preferred solver engine is MapleSim.
 */
 
-/* The intended structure of the completed library is as follows
+/* The structure of the completed library is as follows:
    
    WECHydrodynamics (LIBRARY)
    |->  Excitation Force (PACKAGE)
@@ -37,7 +36,6 @@
    |    |   |-> Bretschneider Spectrum (MODEL)
    |    |
    |    |-> Assemble Excitation Force (MODEL)
-   |    |-> Feed Excitation Force (MODEL)
    |
    |->  Plant Model (MODEL)
    |    |-> TF2DE (MODEL) [!- If the user has the transfer function ODE representation]
@@ -63,20 +61,6 @@
    4. The library is currently incomplete and only works in a 1-DoF heave mode (33)
 */
 
-/*  Work progress:
-    Update as of "Friday, 27 May 2022": Library file created and started
-    Update as of "Monday, 27 June 2022": Package structure defined, documentation initiated, trial 1 of convolution [1]
-    Update as of "Wednesday, 29 June 2022": [1] - update, model does not have a solution. Running code to test whether issue is with Cummins or convolution or approach
-    Update as of "Monday, 11 July 2022": The state space approach to solving the radiation force has been implemented with Cummins' equation [2]. [1] - update [3].
-    Update as of "Thursday, 21 July 2022": The intended purpose has been achieved. Source clean-up is imminent. 
-*/
-
-/*  References:
-    [1] Trial 1 of convolution defines Cummins' equation to include the conv() call directly in the hope that the velocity profile is passed at each internal time step
-    [2] The plant model can be solved using the transfer approach or state space approach, both return results that reasonable match WecSim.
-    [3] Numerical convolution requires discretization of the instataneous velocity continuous variable, which is forbidden inside a function (sample and pre are restricted)
-*/
-
 /*  Present capabilities:
     1. The present library is capable of importing data from a struct in MATLAB to define the hydrodynamic coefficients, excitation force, and state-space quadruple
     2. Capable of estimating the displacement, velocity, acceleration, and radiation forces acting on a single body defined using the state space quadruple
@@ -86,9 +70,8 @@
     1. Implement scalability for the state-space approach using the state-space quadruple matrix operations
     2. Determine how to implement rational-polynomial curve-fitting for the impulse response functions
     3. From the curve-fitting, create state-space controllable form matrices
-    4. Implement [1] with this self-sufficient approach
-    5. Input the mass and hydrostatic forces of the body from the CAD Toolbox
-    6. Implement multi-body capabilities for a 2-body WEC using the CAD Toolbox and import of hydrodynamic coefficients from MATLAB
+    4. Input the mass and hydrostatic forces of the body from MapleSim's CAD Toolbox
+    5. Implement multi-body capabilities for a 2-body WEC using the CAD Toolbox
 */
 
 /*  How to use the library:
@@ -124,7 +107,7 @@ package WECHydrodynamics
   // The irregular waves package currently supports the Pierson Moskowitz spectrum, but can include JONSWAP & Bretschneider spectra as well
   
     package RegularWaves
-    // Package defining regular wave spectrums
+    // Package defining regular wave spectrums - UNDER CONSTRUCTION
     // Defined for both monochromatic & polychromatic spectra
     // Users control parameters of the wave spectrum
     // The components of this package output the surface elevation
@@ -156,7 +139,7 @@ package WECHydrodynamics
     end RegularWaves;
     
     package IrregularWaves
-    // Package defining irregular wave spectrums
+    // Package defining irregular wave spectrums - UNDER CONSTRUCTION
     // Defined for the Pierson Moskowitz spectrum, can be expanded to the Bretschneider & JONSWAP spectra as well
     // Users define the irregular spectral parameters
     // The components of this package output the surface elevation
@@ -164,7 +147,7 @@ package WECHydrodynamics
     end IrregularWaves;
     
     package UserDefinedWave
-    // Package defining wave elevation from user input
+    // Package defining wave elevation from user input - UNDER CONSTRUCTION
     // Defined for any random discrete wave elevation/sea spectrum
     // Users specify the location of the MATLAB file storing the discrete wave elevation distribution
     // The components of this package output the continuous surface elevation
