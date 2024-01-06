@@ -1,4 +1,4 @@
-/*  Wave Energy Converter Hydrodynamics Library
+/*  Modelica Ocean Engineering Toolbox v0.1
     Copyright (C) 2022  Ajay Menon
 
     This program is free software: you can redistribute it and/or modify
@@ -15,15 +15,7 @@
     here <https://www.gnu.org/licenses/>.
 */
 
-// Introduction to the WECHydrodynamics Library  
-/* Modelica library developed by Ajay Menon for Sys-MoDEL
-   
-   This library features hydrodynamic components designed to be used for symbolically modeling Wave Energy Converters (WECs).
-   Currently, hydrodynamic toolboxes are limited to basic features that do not fully capture WEC behaviour.
-   This library is designed to be loaded into MapleSim or OMEdit, although the preferred solver engine is MapleSim.
-*/
-
-/* The structure of the completed library is as follows:
+/* Library structure:
    
    WECHydrodynamics (LIBRARY)
    |->  Excitation Force (PACKAGE)
@@ -47,7 +39,6 @@
    |
    |->  Functions (PACKAGE) - DEPRECATED
    |    |-> discreteToContinuous (FUNCTION)
-   |    |-> ConvIntegral (FUNCTION) - DEPRECATED
    |
    |->  Connectors (PACKAGE)
         |-> Data Collector (CONNECTOR) [!- Transfer non-flange data]
@@ -55,23 +46,13 @@
 
 /* Important notes:
    
-   1. To change the library name, replace all instances of "WECHydrodynamics" with a user-defined phrase.
+   1. To change the library name, replace all instances of "WECHydrodynamics" with your chosen name.
    2. The statement "extends Modelica.Blocks.Icons.Block;" is used to define visibility of the model as a block in the Modelica solver. Removing this statement causes the relevant model to disappear from the library.
    3. This library can be run in any Modelica solver engine, although it is intended for use in MapleSim. Annotations have been prepared accordingly.
-   4. The library is currently incomplete and only works in a 1-DoF heave mode (33)
-*/
 
-/*  Present capabilities:
+    Present capabilities:
     1. The present library is capable of importing data from a struct in MATLAB to define the hydrodynamic coefficients, excitation force, and state-space quadruple
     2. Capable of estimating the displacement, velocity, acceleration, and radiation forces acting on a single body defined using the state space quadruple
-*/
-
-/*  Future work:
-    1. Implement scalability for the state-space approach using the state-space quadruple matrix operations
-    2. Determine how to implement rational-polynomial curve-fitting for the impulse response functions
-    3. From the curve-fitting, create state-space controllable form matrices
-    4. Input the mass and hydrostatic forces of the body from MapleSim's CAD Toolbox
-    5. Implement multi-body capabilities for a 2-body WEC using the CAD Toolbox
 */
 
 /*  How to use the library:
@@ -95,7 +76,7 @@
     10. Attach probes to monitor the required variables and run the simulation. To view radiation force, attach a probe to the component and NOT the flange. From the flange, only mechanical properties can be observed- displacement (s), velocity (v), acceleration (a), force on the flange (f).
 */
 
-// Start of source code
+// Source code
 // Library name: WEC Hydrodynamics
 package WECHydrodynamics
 
