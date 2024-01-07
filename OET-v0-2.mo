@@ -15,12 +15,12 @@
     here <https://www.gnu.org/licenses/>.
 */
 
-/* Library structure:
+/*  Library structure:
      Ocean Engineering Toolbox (LIBRARY)
      |  
      |->  Wave Profile (PACKAGE)
      |    |-> Regular Wave (PACKAGE)
-     |    |   |-> Regular Airy Wave (MODEL)               [!- Monochromatic wave from linear Airy wave theory]
+     |    |   |-> Regular Airy Wave (MODEL)               [!- Monochromatic regular wave]
      |    |
      |    |-> Irregular Wave (PACKAGE)
      |    |   |-> Pierson Moskowitz Spectrum (MODEL)      [!- Fully-developed sea state]
@@ -48,28 +48,34 @@
           |-> DataCollector (CONNECTOR)                   [!- Transfer WEC dynamics - velocity and radiation force]
 */
 
-/* Source Code - START */
+/*  Quick user guide: Run the sample simulation in OpenModelica Editor (O.M. Edit) after changing all file addresses to a user-specified address where the MATLAB struct is located. */
+
+/* Source Code */
 package OceanEngineeringToolbox
   /*  Library visibility */
   extends Modelica.Icons.Package;
 
   package WaveProfile
+    
     package RegularWave
+    /* Package for regular wave elevation profile and excitation force calculations */
+      
       model AiryWave
-        /*  Airy Wave - Wave elevation profile and excitation force */
+        /*  Wave elevation profile and excitation force */
         extends Modelica.Blocks.Icons.Block;
         import Modelica.Math.Vectors;
         Modelica.Blocks.Interfaces.RealOutput F_exc "Wave excitation time series" annotation(
           Placement(transformation(extent = {{100, -10}, {120, 10}})));
         
         /*  Variable declarations */
-        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/WEC-Sim Simulations/Float Line Attenuator/PlateBEM.mat", "PlateBEM.FexcRe", 1, 260);
-        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/WEC-Sim Simulations/Float Line Attenuator/PlateBEM.mat", "PlateBEM.FexcIm", 1, 260);
-        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/WEC-Sim Simulations/Float Line Attenuator/PlateBEM.mat", "PlateBEM.w", 1, 260);
+        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.FexcRe", 1, 260);
+        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.FexcIm", 1, 260);
+        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.w", 1, 260);
         Real F_excRe[260] "Real component of excitation coefficient from BEMIO";
         Real F_excIm[260] "Imaginary component of excitation coefficient from BEMIO";
         Real w2[260] "Frequency distribution from BEMIO output file";
-        
+
+        /* Environmental constants */
         constant Real pi = Modelica.Constants.pi "Mathematical constant pi";
         constant Real g = Modelica.Constants.g_n "Acceleration due to gravity";
         
@@ -86,7 +92,6 @@ package OceanEngineeringToolbox
         Real zeta_rmp "Ramp value for surface elevation";
         Modelica.Units.SI.Length SSE "Sea surface elevation";
         Modelica.Units.SI.Length SSE_unramp "Unramped sea surface elevation";
-      
       equation
         /* Convert Matlab-import matrices to vectors */
         for i in 1:260 loop
@@ -115,30 +120,32 @@ package OceanEngineeringToolbox
           Icon(graphics = {Line(origin = {-50.91, 48.08}, points = {{-33.2809, -22.5599}, {-21.2809, -20.5599}, {-13.2809, 27.4401}, {6.71907, -20.5599}, {24.7191, -24.5599}, {42.7191, -24.5599}, {44.7191, -24.5599}}, color = {255, 0, 0}, smooth = Smooth.Bezier), Line(origin = {-37, 51}, points = {{-51, 29}, {-51, -29}, {37, -29}}), Text(origin = {6, 55}, extent = {{-40, 17}, {40, -17}}, textString = "Hs"), Line(origin = {22, 4}, points = {{0, 22}, {0, -22}}, thickness = 1, arrow = {Arrow.None, Arrow.Filled}), Line(origin = {-7.57, -61.12}, points = {{-82.4341, -12.8774}, {-76.4341, -2.87735}, {-72.4341, -6.87735}, {-62.4341, 13.1226}, {-50.4341, -26.8774}, {-46.4341, -20.8774}, {-38.4341, -26.8774}, {-34.4341, -18.8774}, {-34.4341, 3.12265}, {-26.4341, 1.12265}, {-20.4341, 7.12265}, {-12.4341, 9.12265}, {-8.43408, 19.1226}, {1.56592, -4.87735}, {7.56592, -24.8774}, {19.5659, -6.87735}, {21.5659, 9.12265}, {31.5659, 13.1226}, {39.5659, -0.87735}, {43.5659, 11.1226}, {55.5659, 15.1226}, {63.5659, 27.1226}, {79.5659, -22.8774}}, color = {0, 0, 255}, smooth = Smooth.Bezier), Rectangle(origin = {100, 0}, fillColor = {85, 255, 127}, fillPattern = FillPattern.Solid, extent = {{-20, 20}, {20, -20}})}, coordinateSystem(initialScale = 0.1)),
           experiment(StartTime = 0, StopTime = 400, Tolerance = 1e-06, Interval = 0.05));
       end AiryWave;
-    
     end RegularWave;
 
     package IrregularWave
-    
+    /* Package for irregular wave elevation profile and excitation force calculations */
+      
       model PiersonMoskowitzWave
         /*  Pierson Moskowitz Spectrum - Wave elevation profile and excitation force */
         extends Modelica.Blocks.Icons.Block;
         import Modelica.Math.Vectors;
         OceanEngineeringToolbox.Connectors.WaveOutConn wconn;
-/*        Modelica.Blocks.Interfaces.RealOutput F_exc "Wave time series" annotation(
-          Placement(transformation(extent = {{100, -10}, {120, 10}})));*/
+        /* Modelica.Blocks.Interfaces.RealOutput F_exc "Wave time series" annotation(
+          Placement(transformation(extent = {{100, -10}, {120, 10}}))); */
         
         /*  Variable declarations */
-        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/WEC-Sim Simulations/Float Line Attenuator/PlateBEM.mat", "PlateBEM.FexcRe", 1, 260);
-        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/WEC-Sim Simulations/Float Line Attenuator/PlateBEM.mat", "PlateBEM.FexcIm", 1, 260);
-        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/WEC-Sim Simulations/Float Line Attenuator/PlateBEM.mat", "PlateBEM.w", 1, 260);
+        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.FexcRe", 1, 260);
+        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.FexcIm", 1, 260);
+        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.w", 1, 260);
         Real F_excRe[260] "Real component of excitation coefficient from BEMIO";
         Real F_excIm[260] "Imaginary component of excitation coefficient from BEMIO";
         Real w2[260] "Frequency distribution from BEMIO output file";
-        
+
+        /* Environmental constants */
         constant Real pi = Modelica.Constants.pi "Mathematical constant pi";
         constant Real g = Modelica.Constants.g_n "Acceleration due to gravity";
-        
+
+        /* Parameters */
         parameter Modelica.Units.SI.Length d = 100 "Water depth";
         parameter Modelica.Units.SI.Density rho = 1025 "Density of seawater";
         parameter Modelica.Units.SI.Length Hs = 2.5 "Significant Wave Height";
@@ -160,12 +167,12 @@ package OceanEngineeringToolbox
         parameter Modelica.Units.SI.Length zeta[n_omega] = sqrt(2*S*omega_min) "Wave amplitude component";
         parameter Real Tp[n_omega] = 2*pi./omega "Wave period components";
         parameter Real k[n_omega] = OceanEngineeringToolbox.Functions.waveNumber(d, omega) "Wave number component";
+        
         Real ExcCoeffRe[n_omega] "Real component of excitation coefficient for frequency components";
         Real ExcCoeffIm[n_omega] "Imaginary component of excitation coefficient for frequency components";
         Real zeta_rmp[n_omega] "Ramp value for surface elevation";
         Modelica.Units.SI.Length SSE "Sea surface elevation";
         Modelica.Units.SI.Length SSE_unramp "Unramped sea surface elevation";
-      
       equation
         /* Convert Matlab-import matrices to vectors */
         for i in 1:260 loop
@@ -205,16 +212,18 @@ package OceanEngineeringToolbox
           Placement(transformation(extent = {{100, -10}, {120, 10}})));
         
         /*  Variable declarations */
-        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/WEC-Sim Simulations/Float Line Attenuator/PlateBEM.mat", "PlateBEM.FexcRe", 1, 260);
-        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/WEC-Sim Simulations/Float Line Attenuator/PlateBEM.mat", "PlateBEM.FexcIm", 1, 260);
-        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/WEC-Sim Simulations/Float Line Attenuator/PlateBEM.mat", "PlateBEM.w", 1, 260);
+        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.FexcRe", 1, 260);
+        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.FexcIm", 1, 260);
+        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.w", 1, 260);
         Real F_excRe[260] "Real component of excitation coefficient from BEMIO";
         Real F_excIm[260] "Imaginary component of excitation coefficient from BEMIO";
         Real w2[260] "Frequency distribution from BEMIO output file";
-        
+
+        /* Environmental constants */
         constant Real pi = Modelica.Constants.pi "Mathematical constant pi";
         constant Real g = Modelica.Constants.g_n "Acceleration due to gravity";
-        
+
+        /* Parameters */
         parameter Modelica.Units.SI.Length d = 100 "Water depth";
         parameter Modelica.Units.SI.Density rho = 1025 "Density of seawater";
         parameter Modelica.Units.SI.Length Hs = 2.5 "Significant Wave Height";
@@ -234,12 +243,12 @@ package OceanEngineeringToolbox
         parameter Modelica.Units.SI.Length zeta[n_omega] = sqrt(2*S*omega_min) "Wave amplitude component";
         parameter Real Tp[n_omega] = 2*pi./omega "Wave period components";
         parameter Real k[n_omega] = OceanEngineeringToolbox.Functions.waveNumber(d, omega) "Wave number component";
+        
         Real ExcCoeffRe[n_omega] "Real component of excitation coefficient for frequency components";
         Real ExcCoeffIm[n_omega] "Imaginary component of excitation coefficient for frequency components";
         Real zeta_rmp[n_omega] "Ramp value for surface elevation";
         Modelica.Units.SI.Length SSE "Sea surface elevation";
         Modelica.Units.SI.Length SSE_unramp "Unramped sea surface elevation";
-      
       equation
         /* Convert Matlab-import matrices to vectors */
         for i in 1:260 loop
@@ -279,16 +288,18 @@ package OceanEngineeringToolbox
           Placement(transformation(extent = {{100, -10}, {120, 10}})));
         
         /*  Variable declarations */
-        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/WEC-Sim Simulations/Float Line Attenuator/PlateBEM.mat", "PlateBEM.FexcRe", 1, 260);
-        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/WEC-Sim Simulations/Float Line Attenuator/PlateBEM.mat", "PlateBEM.FexcIm", 1, 260);
-        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/WEC-Sim Simulations/Float Line Attenuator/PlateBEM.mat", "PlateBEM.w", 1, 260);
+        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.FexcRe", 1, 260);
+        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.FexcIm", 1, 260);
+        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.w", 1, 260);
         Real F_excRe[260] "Real component of excitation coefficient from BEMIO";
         Real F_excIm[260] "Imaginary component of excitation coefficient from BEMIO";
         Real w2[260] "Frequency distribution from BEMIO output file";
-        
+
+        /* Environmental constants */
         constant Real pi = Modelica.Constants.pi "Mathematical constant pi";
         constant Real g = Modelica.Constants.g_n "Acceleration due to gravity";
-        
+
+        /* Parameters */
         parameter Modelica.Units.SI.Length d = 100 "Water depth";
         parameter Modelica.Units.SI.Density rho = 1025 "Density of seawater";
         parameter Modelica.Units.SI.Length Hs = 2.5 "Significant Wave Height";
@@ -310,12 +321,12 @@ package OceanEngineeringToolbox
         parameter Modelica.Units.SI.Length zeta[n_omega] = sqrt(2*S*omega_min) "Wave amplitude component";
         parameter Real Tp[n_omega] = 2*pi./omega "Wave period components";
         parameter Real k[n_omega] = OceanEngineeringToolbox.Functions.waveNumber(d, omega) "Wave number component";
+        
         Real ExcCoeffRe[n_omega] "Real component of excitation coefficient for frequency components";
         Real ExcCoeffIm[n_omega] "Imaginary component of excitation coefficient for frequency components";
         Real zeta_rmp[n_omega] "Ramp value for surface elevation";
         Modelica.Units.SI.Length SSE "Sea surface elevation";
         Modelica.Units.SI.Length SSE_unramp "Unramped sea surface elevation";
-      
       equation
         /* Convert Matlab-import matrices to vectors */
         for i in 1:260 loop
@@ -352,57 +363,59 @@ package OceanEngineeringToolbox
   end WaveProfile;
 
   model WEC
-    /* Solve Cummins' equation using state-space modelling */
+    /* Solve Cummins' equation using state-space model of the radiation convolution integral */
     extends Modelica.Blocks.Icons.Block;
     
-/*    Modelica.Mechanics.Translational.Interfaces.Flange_a flange_a "Mechanical flange - displacement & force" annotation(
-      Placement(transformation(extent = {{90, -10}, {110, 10}})));
-*/
+    /* Modelica.Mechanics.Translational.Interfaces.Flange_a flange_a "Mechanical flange - displacement & force" annotation(
+      Placement(transformation(extent = {{90, -10}, {110, 10}}))); */
+    /* Connectors */
     OceanEngineeringToolbox.Connectors.WaveInConn wconn "Connector for wave elevation and excitation force" annotation(
       Placement(transformation(extent = {{-90, -10}, {-110, 10}})));
     OceanEngineeringToolbox.Connectors.DataCollector conn() "Connector for velocity and radiation force" annotation(
       Placement(transformation(extent = {{-10,90}, {10,110}})));
-          
-    parameter Modelica.Units.SI.Mass M = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/Mitacs Globalink 2022/Sys-MoDEL/Matlab files/MATLAB Workspace Files/bemData.mat", "bemData.m33", 1, 1)) "Total mass of the body (including ballast)";
-    parameter Modelica.Units.SI.Mass Ainf = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/Mitacs Globalink 2022/Sys-MoDEL/Matlab files/MATLAB Workspace Files/bemData.mat", "bemData.Ainf33", 1, 1)) "Added mass at maximum (cut-off) frequency";
-    parameter Modelica.Units.SI.TranslationalSpringConstant C = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/Mitacs Globalink 2022/Sys-MoDEL/Matlab files/MATLAB Workspace Files/bemData.mat", "bemData.Khs33", 1, 1)) "Hydrostatic stiffness";
-    parameter Real A1[2, 2] = Modelica.Utilities.Streams.readRealMatrix("D:/Mitacs Globalink 2022/Sys-MoDEL/Matlab files/MATLAB Workspace Files/bemData.mat", "bemData.ss_rad33.A", 2, 2) "State matrix";
-    parameter Real B1[1, 2] = transpose(Modelica.Utilities.Streams.readRealMatrix("D:/Mitacs Globalink 2022/Sys-MoDEL/Matlab files/MATLAB Workspace Files/bemData.mat", "bemData.ss_rad33.B", 2, 1)) "Input matrix";
-    parameter Real C1[1, 2] = Modelica.Utilities.Streams.readRealMatrix("D:/Mitacs Globalink 2022/Sys-MoDEL/Matlab files/MATLAB Workspace Files/bemData.mat", "bemData.ss_rad33.C", 1, 2) "Output matrix";
-    parameter Real D1 = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/Mitacs Globalink 2022/Sys-MoDEL/Matlab files/MATLAB Workspace Files/bemData.mat", "bemData.ss_rad33.D", 1, 1)) "Feedthrough / feedforward matrix";
-    Real x1;
+
+    /* Parameters & variables */
+    parameter Modelica.Units.SI.Mass M = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/.../bemData.mat", "bemData.m33", 1, 1)) "Total mass of the body (including ballast)";
+    parameter Modelica.Units.SI.Mass Ainf = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/.../bemData.mat", "bemData.Ainf33", 1, 1)) "Added mass at maximum (cut-off) frequency";
+    parameter Modelica.Units.SI.TranslationalSpringConstant C = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/.../bemData.mat", "bemData.Khs33", 1, 1)) "Hydrostatic stiffness";
+    parameter Real A1[2, 2] = Modelica.Utilities.Streams.readRealMatrix("D:/.../bemData.mat", "bemData.ss_rad33.A", 2, 2) "State matrix";
+    parameter Real B1[1, 2] = transpose(Modelica.Utilities.Streams.readRealMatrix("D:/.../bemData.mat", "bemData.ss_rad33.B", 2, 1)) "Input matrix";
+    parameter Real C1[1, 2] = Modelica.Utilities.Streams.readRealMatrix("D:/.../bemData.mat", "bemData.ss_rad33.C", 1, 2) "Output matrix";
+    parameter Real D1 = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/.../bemData.mat", "bemData.ss_rad33.D", 1, 1)) "Feedthrough / feedforward matrix";
+    
+  Real x1;
     Real x2;
     Modelica.Units.SI.Length z "Heave displacement";
     Modelica.Units.SI.Velocity v_z "Heave velocity";
     Modelica.Units.SI.Acceleration a_z "Heave acceleration";
     Modelica.Units.SI.Force F_rad "Radiation Force";
-  
   initial equation
-/* Define body at rest initially */
+  /* Define body at rest initially */
     z = 0;
     v_z = 0;
-  
   equation
-/*    flange_a.f = wconn.F_exc "Excitation force acts on plant";
-    z = flange_a.s "Plant motion is tied to the vertical displacement";*/
+  /* flange_a.f = wconn.F_exc "Excitation force acts on plant";
+    z = flange_a.s "Plant motion is tied to the vertical displacement"; */
     v_z = der(z) "Heave velocity";
     a_z = der(v_z) "Heave acceleration";
 
     der(x1) = (A1[1, 1]*x1) + (A1[1, 2]*x2) + (B1[1, 1]*v_z);
     der(x2) = (A1[2, 1]*x1) + (A1[2, 2]*x2) + (B1[1, 2]*v_z);
     F_rad = (C1[1, 1]*x1) + (C1[1, 2]*x2) + (D1*v_z);
-/* Cummins' equation */
+    
+    /* Cummins' equation */
     ((M + Ainf)*a_z) + F_rad + (C*z) = wconn.F_exc;
-/* Connector declarations */
-      conn.F_rad = F_rad;
-      conn.v_z = v_z;
+    
+    /* Connector declarations */
+    conn.F_rad = F_rad;
+    conn.v_z = v_z;
   end WEC;
 
   package Functions
     /* Package defining explicit library functions */
 
     function waveNumber
-    /*  Function to iteratively compute the wave number from the frequency components */
+    /* Function to iteratively compute the wave number from the frequency components */
       input Real d "Water depth";
       input Real omega[:] "Wave frequency components";
       output Real k[size(omega, 1)] "Wave number components";
@@ -415,7 +428,6 @@ package OceanEngineeringToolbox
       Real L1(start = 0, fixed = true) "Temporary variable";
       Real L1c(start = 0, fixed = true) "Temporary variable";
       Real L[size(omega, 1)] "Iterated wave length";
-    
     algorithm
       T := 2*pi./omega;
       L0 := g*T.^2/(2*pi);
@@ -432,14 +444,13 @@ package OceanEngineeringToolbox
     end waveNumber;
 
     function randomNumberGen
-    /*  Function to generate random numbers from local and global seeds using XOR shift */
+    /* Function to generate random numbers from local and global seeds using XOR shift */
       input Integer ls = 614657 "Local seed";
       input Integer gs = 30020 "Global seed";
       input Integer n = 100 "Number of frequency components";
       output Real r64[n] "Random number vector";
     protected
       Integer state64[2](each start = 0, each fixed = true);
-    
     algorithm
       state64[1] := 0;
       state64[2] := 0;
@@ -454,14 +465,13 @@ package OceanEngineeringToolbox
     end randomNumberGen;
 
     function frequencySelector
-    /*  Function to randomly select frequency components */
+    /* Function to randomly select frequency components */
       input Real omega_min "Frequency minima";
       input Real omega_max "Frequency maxima";
       input Real epsilon[:] "Random phase vector";
       output Real omega[size(epsilon, 1)] "Output vector of frequency components";
     protected
       parameter Real ref_omega[size(epsilon, 1)] = omega_min:(omega_max - omega_min)/(size(epsilon, 1) - 1):omega_max;
-    
     algorithm
       omega[1] := omega_min;
       for i in 2:size(epsilon, 1) - 1 loop
@@ -471,14 +481,13 @@ package OceanEngineeringToolbox
     end frequencySelector;
 
     function spectrumGenerator_PM
-    /*  Function to generate Pierson Moskowitz spectrum */
+    /* Function to generate Pierson Moskowitz spectrum */
       input Real Hs = 1 "Significant wave height";
       input Real omega[:] "Frequency components";
       output Real spec[size(omega, 1)] "Spectral values for input frequencies";
     protected
       constant Real pi = Modelica.Constants.pi;
       constant Real g = Modelica.Constants.g_n;
-
     algorithm
       for i in 1:size(omega, 1) loop
         spec[i] := 0.0081*g^2/omega[i]^5*exp(-0.0358*(g/(Hs*omega[i]^2))^2);
@@ -486,7 +495,7 @@ package OceanEngineeringToolbox
     end spectrumGenerator_PM;
 
     function spectrumGenerator_BRT
-    /*  Function to generate Brettschneider spectrum */
+    /* Function to generate Brettschneider spectrum */
       input Real Hs = 1 "Significant wave height";
       input Real omega[:] "Frequency components";
       input Real omega_peak = 0.9423 "Peak spectral frequency";
@@ -501,7 +510,7 @@ package OceanEngineeringToolbox
     end spectrumGenerator_BRT;
 
     function spectrumGenerator_JONSWAP
-    /*  Function to generate JONSWAP spectrum */
+    /* Function to generate JONSWAP spectrum */
       input Real Hs = 1 "Significant wave height";
       input Real omega[:] "Frequency components";
       input Real omega_peak = 0.9423 "Peak spectral frequency";
@@ -529,22 +538,22 @@ package OceanEngineeringToolbox
   end Functions;
 
   package Connectors
-  /*  Package defining library connectors between models */
+  /* Package defining library connectors between models */
     
     connector WaveOutConn
-    /*  Output datastream - wave elevation & excitation force */
+    /* Output datastream - wave elevation & excitation force */
       //Modelica.Blocks.Interfaces.RealOutput SSE;
       Modelica.Blocks.Interfaces.RealOutput F_exc;
     end WaveOutConn;
     
     connector WaveInConn
-    /*  Input datastream - wave elevation & excitation force */
+    /* Input datastream - wave elevation & excitation force */
       //Modelica.Blocks.Interfaces.RealInput SSE;
       Modelica.Blocks.Interfaces.RealInput F_exc;
     end WaveInConn;
     
     connector DataCollector
-    /*  Output datastream - velocity and radiation force */
+    /* Output datastream - velocity and radiation force */
       Modelica.Blocks.Interfaces.RealOutput F_rad;
       Modelica.Blocks.Interfaces.RealOutput v_z;
     end DataCollector;
@@ -555,6 +564,7 @@ package OceanEngineeringToolbox
   /* Sample simulation models */
     
     model sample1
+      /* Single body, irregular waves with PM spectrum */
       OceanEngineeringToolbox.WaveProfile.IrregularWave.PiersonMoskowitzWave PM1;
       OceanEngineeringToolbox.WEC WEC1;
     equation
@@ -567,7 +577,6 @@ package OceanEngineeringToolbox
   end SampleSimulations;
 
 end OceanEngineeringToolbox;
-/* Source Code - END */
 
 /*  Modelica Ocean Engineering Toolbox (OET)
     Developed at:
