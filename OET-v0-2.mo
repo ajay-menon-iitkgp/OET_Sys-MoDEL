@@ -151,7 +151,32 @@ package OceanEngineeringToolbox
       end for;
       k := 2*pi./L;
     end waveNumber;
+
   end Functions;
+
+  package Connectors
+  /*  Package defining library connectors between models */
+    
+    connector WaveOutConn
+    /*  Output datastream - wave elevation & excitation force */
+      //Modelica.Blocks.Interfaces.RealOutput SSE;
+      Modelica.Blocks.Interfaces.RealOutput F_exc;
+    end WaveOutConn;
+    
+    connector WaveInConn
+    /*  Input datastream - wave elevation & excitation force */
+      //Modelica.Blocks.Interfaces.RealInput SSE;
+      Modelica.Blocks.Interfaces.RealInput F_exc;
+    end WaveInConn;
+    
+    connector DataCollector
+    /*  Output datastream - velocity and radiation force */
+      Modelica.Blocks.Interfaces.RealOutput F_rad;
+      Modelica.Blocks.Interfaces.RealOutput v_z;
+    end DataCollector;
+    
+  end Connectors;
+
 end OceanEngineeringToolbox;
 /* Source Code - END */
 
