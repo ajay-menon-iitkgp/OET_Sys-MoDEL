@@ -351,6 +351,53 @@ package OceanEngineeringToolbox
 
   end WaveProfile;
 
+  model WEC
+    /* Solve Cummins' equation using state-space modelling */
+    extends Modelica.Blocks.Icons.Block;
+    
+/*    Modelica.Mechanics.Translational.Interfaces.Flange_a flange_a "Mechanical flange - displacement & force" annotation(
+      Placement(transformation(extent = {{90, -10}, {110, 10}})));
+*/
+    OceanEngineeringToolbox.Connectors.WaveInConn wconn "Connector for wave elevation and excitation force" annotation(
+      Placement(transformation(extent = {{-90, -10}, {-110, 10}})));
+    OceanEngineeringToolbox.Connectors.DataCollector conn() "Connector for velocity and radiation force" annotation(
+      Placement(transformation(extent = {{-10,90}, {10,110}})));
+          
+    parameter Modelica.Units.SI.Mass M = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/Mitacs Globalink 2022/Sys-MoDEL/Matlab files/MATLAB Workspace Files/bemData.mat", "bemData.m33", 1, 1)) "Total mass of the body (including ballast)";
+    parameter Modelica.Units.SI.Mass Ainf = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/Mitacs Globalink 2022/Sys-MoDEL/Matlab files/MATLAB Workspace Files/bemData.mat", "bemData.Ainf33", 1, 1)) "Added mass at maximum (cut-off) frequency";
+    parameter Modelica.Units.SI.TranslationalSpringConstant C = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/Mitacs Globalink 2022/Sys-MoDEL/Matlab files/MATLAB Workspace Files/bemData.mat", "bemData.Khs33", 1, 1)) "Hydrostatic stiffness";
+    parameter Real A1[2, 2] = Modelica.Utilities.Streams.readRealMatrix("D:/Mitacs Globalink 2022/Sys-MoDEL/Matlab files/MATLAB Workspace Files/bemData.mat", "bemData.ss_rad33.A", 2, 2) "State matrix";
+    parameter Real B1[1, 2] = transpose(Modelica.Utilities.Streams.readRealMatrix("D:/Mitacs Globalink 2022/Sys-MoDEL/Matlab files/MATLAB Workspace Files/bemData.mat", "bemData.ss_rad33.B", 2, 1)) "Input matrix";
+    parameter Real C1[1, 2] = Modelica.Utilities.Streams.readRealMatrix("D:/Mitacs Globalink 2022/Sys-MoDEL/Matlab files/MATLAB Workspace Files/bemData.mat", "bemData.ss_rad33.C", 1, 2) "Output matrix";
+    parameter Real D1 = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/Mitacs Globalink 2022/Sys-MoDEL/Matlab files/MATLAB Workspace Files/bemData.mat", "bemData.ss_rad33.D", 1, 1)) "Feedthrough / feedforward matrix";
+    Real x1;
+    Real x2;
+    Modelica.Units.SI.Length z "Heave displacement";
+    Modelica.Units.SI.Velocity v_z "Heave velocity";
+    Modelica.Units.SI.Acceleration a_z "Heave acceleration";
+    Modelica.Units.SI.Force F_rad "Radiation Force";
+  
+  initial equation
+/* Define body at rest initially */
+    z = 0;
+    v_z = 0;
+  
+  equation
+/*    flange_a.f = wconn.F_exc "Excitation force acts on plant";
+    z = flange_a.s "Plant motion is tied to the vertical displacement";*/
+    v_z = der(z) "Heave velocity";
+    a_z = der(v_z) "Heave acceleration";
+
+    der(x1) = (A1[1, 1]*x1) + (A1[1, 2]*x2) + (B1[1, 1]*v_z);
+    der(x2) = (A1[2, 1]*x1) + (A1[2, 2]*x2) + (B1[1, 2]*v_z);
+    F_rad = (C1[1, 1]*x1) + (C1[1, 2]*x2) + (D1*v_z);
+/* Cummins' equation */
+    ((M + Ainf)*a_z) + F_rad + (C*z) = wconn.F_exc;
+/* Connector declarations */
+      conn.F_rad = F_rad;
+      conn.v_z = v_z;
+  end WEC;
+
   package Functions
     /* Package defining explicit library functions */
 
