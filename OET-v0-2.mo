@@ -117,6 +117,88 @@ package OceanEngineeringToolbox
       end AiryWave;
     
     end RegularWave;
+
+    package IrregularWave
+    
+      model PiersonMoskowitzWave
+        /*  Pierson Moskowitz Spectrum - Wave elevation profile and excitation force */
+        extends Modelica.Blocks.Icons.Block;
+        import Modelica.Math.Vectors;
+        OceanEngineeringToolbox.Connectors.WaveOutConn wconn;
+/*        Modelica.Blocks.Interfaces.RealOutput F_exc "Wave time series" annotation(
+          Placement(transformation(extent = {{100, -10}, {120, 10}})));*/
+        
+        /*  Variable declarations */
+        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/WEC-Sim Simulations/Float Line Attenuator/PlateBEM.mat", "PlateBEM.FexcRe", 1, 260);
+        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/WEC-Sim Simulations/Float Line Attenuator/PlateBEM.mat", "PlateBEM.FexcIm", 1, 260);
+        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/WEC-Sim Simulations/Float Line Attenuator/PlateBEM.mat", "PlateBEM.w", 1, 260);
+        Real F_excRe[260] "Real component of excitation coefficient from BEMIO";
+        Real F_excIm[260] "Imaginary component of excitation coefficient from BEMIO";
+        Real w2[260] "Frequency distribution from BEMIO output file";
+        
+        constant Real pi = Modelica.Constants.pi "Mathematical constant pi";
+        constant Real g = Modelica.Constants.g_n "Acceleration due to gravity";
+        
+        parameter Modelica.Units.SI.Length d = 100 "Water depth";
+        parameter Modelica.Units.SI.Density rho = 1025 "Density of seawater";
+        parameter Modelica.Units.SI.Length Hs = 2.5 "Significant Wave Height";
+        parameter Modelica.Units.SI.AngularFrequency omega_min = 0.03141 "Lowest frequency component/frequency interval";
+        parameter Modelica.Units.SI.AngularFrequency omega_max = 3.141 "Highest frequency component";
+        parameter Modelica.Units.SI.AngularFrequency omega_peak = 0.9423 "Peak spectral frequency";
+        parameter Real spectralWidth_min = 0.07 "Lower spectral bound for JONSWAP";
+        parameter Real spectralWidth_max = 0.09 "Upper spectral bound for JONSWAP";
+        parameter Integer n_omega = 100 "Number of frequency components";
+        parameter Integer localSeed = 614657 "Local random seed";
+        parameter Integer globalSeed = 30020 "Global random seed";
+        parameter Real rnd_shft[n_omega] = OceanEngineeringToolbox.Functions.randomNumberGen(localSeed, globalSeed, n_omega);
+        parameter Integer localSeed1 = 614757 "Local rand seed";
+        parameter Integer globalSeed1 = 40020 "Global rand seed";
+        parameter Real epsilon[n_omega] = OceanEngineeringToolbox.Functions.randomNumberGen(localSeed1, globalSeed1, n_omega) "Wave components phase shift";
+        parameter Real Trmp = 100 "Interval for ramping up of waves during start phase";
+        parameter Real omega[n_omega] = OceanEngineeringToolbox.Functions.frequencySelector(omega_min, omega_max, rnd_shft);
+        parameter Real S[n_omega] = OceanEngineeringToolbox.Functions.spectrumGenerator_PM(Hs, omega) "Spectral values for frequency components";
+        parameter Modelica.Units.SI.Length zeta[n_omega] = sqrt(2*S*omega_min) "Wave amplitude component";
+        parameter Real Tp[n_omega] = 2*pi./omega "Wave period components";
+        parameter Real k[n_omega] = OceanEngineeringToolbox.Functions.waveNumber(d, omega) "Wave number component";
+        Real ExcCoeffRe[n_omega] "Real component of excitation coefficient for frequency components";
+        Real ExcCoeffIm[n_omega] "Imaginary component of excitation coefficient for frequency components";
+        Real zeta_rmp[n_omega] "Ramp value for surface elevation";
+        Modelica.Units.SI.Length SSE "Sea surface elevation";
+        Modelica.Units.SI.Length SSE_unramp "Unramped sea surface elevation";
+      
+      equation
+        /* Convert Matlab-import matrices to vectors */
+        for i in 1:260 loop
+          F_excRe[i] = Fexc_Re[1, i];
+          F_excIm[i] = Fexc_Im[1, i];
+          w2[i] = w[1, i];
+        end for;
+    
+        /* Define amplitude for each frequency component - ramp time */
+        for i in 1:n_omega loop
+          if time < Trmp then
+            zeta_rmp[i] = (1+cos(pi+(pi*time/Trmp)))*zeta[i];
+          else
+            zeta_rmp[i] = zeta[i];
+          end if;
+          
+          /* Interpolate excitation coefficients (Re & Im) for each frequency component */
+          ExcCoeffRe[i] = Modelica.Math.Vectors.interpolate(w2, F_excRe, omega[i])*rho*g;
+          ExcCoeffIm[i] = Modelica.Math.Vectors.interpolate(w2, F_excIm, omega[i])*rho*g;
+        end for;
+        
+        /* Define wave elevation profile (SSE) and excitation force */
+        SSE = sum(zeta_rmp.*cos(omega*time - 2*pi*epsilon));
+        SSE_unramp = sum(zeta.*cos(omega*time - 2*pi*epsilon));
+        wconn.F_exc = sum((ExcCoeffRe.*zeta_rmp.*cos(omega*time-2*pi*epsilon))-(ExcCoeffIm.*zeta_rmp.*sin(omega*time-2*pi*epsilon)));
+        
+        annotation(
+          Icon(graphics = {Line(origin = {-50.91, 48.08}, points = {{-33.2809, -22.5599}, {-21.2809, -20.5599}, {-13.2809, 27.4401}, {6.71907, -20.5599}, {24.7191, -24.5599}, {42.7191, -24.5599}, {44.7191, -24.5599}}, color = {255, 0, 0}, smooth = Smooth.Bezier), Line(origin = {-37, 51}, points = {{-51, 29}, {-51, -29}, {37, -29}}), Text(origin = {6, 55}, extent = {{-40, 17}, {40, -17}}, textString = "Hs"), Line(origin = {22, 4}, points = {{0, 22}, {0, -22}}, thickness = 1, arrow = {Arrow.None, Arrow.Filled}), Line(origin = {-7.57, -61.12}, points = {{-82.4341, -12.8774}, {-76.4341, -2.87735}, {-72.4341, -6.87735}, {-62.4341, 13.1226}, {-50.4341, -26.8774}, {-46.4341, -20.8774}, {-38.4341, -26.8774}, {-34.4341, -18.8774}, {-34.4341, 3.12265}, {-26.4341, 1.12265}, {-20.4341, 7.12265}, {-12.4341, 9.12265}, {-8.43408, 19.1226}, {1.56592, -4.87735}, {7.56592, -24.8774}, {19.5659, -6.87735}, {21.5659, 9.12265}, {31.5659, 13.1226}, {39.5659, -0.87735}, {43.5659, 11.1226}, {55.5659, 15.1226}, {63.5659, 27.1226}, {79.5659, -22.8774}}, color = {0, 0, 255}, smooth = Smooth.Bezier), Rectangle(origin = {100, 0}, fillColor = {85, 255, 127}, fillPattern = FillPattern.Solid, extent = {{-20, 20}, {20, -20}})}, coordinateSystem(initialScale = 0.1)),
+          experiment(StartTime = 0, StopTime = 400, Tolerance = 1e-06, Interval = 0.05));
+      end PiersonMoskowitzWave;
+
+    end IrregularWave;
+
   end WaveProfile;
 
   package Functions
@@ -151,6 +233,60 @@ package OceanEngineeringToolbox
       end for;
       k := 2*pi./L;
     end waveNumber;
+
+    function randomNumberGen
+    /*  Function to generate random numbers from local and global seeds using XOR shift */
+      input Integer ls = 614657 "Local seed";
+      input Integer gs = 30020 "Global seed";
+      input Integer n = 100 "Number of frequency components";
+      output Real r64[n] "Random number vector";
+    protected
+      Integer state64[2](each start = 0, each fixed = true);
+    
+    algorithm
+      state64[1] := 0;
+      state64[2] := 0;
+      for i in 1:n loop
+        if i == 1 then
+          state64 := Modelica.Math.Random.Generators.Xorshift64star.initialState(ls, gs);
+          r64[i] := 0;
+        else
+          (r64[i], state64) := Modelica.Math.Random.Generators.Xorshift64star.random((state64));
+        end if;
+      end for;
+    end randomNumberGen;
+
+    function frequencySelector
+    /*  Function to randomly select frequency components */
+      input Real omega_min "Frequency minima";
+      input Real omega_max "Frequency maxima";
+      input Real epsilon[:] "Random phase vector";
+      output Real omega[size(epsilon, 1)] "Output vector of frequency components";
+    protected
+      parameter Real ref_omega[size(epsilon, 1)] = omega_min:(omega_max - omega_min)/(size(epsilon, 1) - 1):omega_max;
+    
+    algorithm
+      omega[1] := omega_min;
+      for i in 2:size(epsilon, 1) - 1 loop
+        omega[i] := ref_omega[i] + epsilon[i]*omega_min;
+      end for;
+      omega[size(epsilon, 1)] := omega_max;
+    end frequencySelector;
+
+    function spectrumGenerator_PM
+    /*  Function to generate Pierson Moskowitz spectrum */
+      input Real Hs = 1 "Significant wave height";
+      input Real omega[:] "Frequency components";
+      output Real spec[size(omega, 1)] "Spectral values for input frequencies";
+    protected
+      constant Real pi = Modelica.Constants.pi;
+      constant Real g = Modelica.Constants.g_n;
+
+    algorithm
+      for i in 1:size(omega, 1) loop
+        spec[i] := 0.0081*g^2/omega[i]^5*exp(-0.0358*(g/(Hs*omega[i]^2))^2);
+      end for;
+    end spectrumGenerator_PM;
 
   end Functions;
 
