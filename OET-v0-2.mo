@@ -551,6 +551,21 @@ package OceanEngineeringToolbox
     
   end Connectors;
 
+  package SampleSimulations
+  /* Sample simulation models */
+    
+    model sample1
+      OceanEngineeringToolbox.WaveProfile.IrregularWave.PiersonMoskowitzWave PM1;
+      OceanEngineeringToolbox.WEC WEC1;
+    equation
+      connect(PM1.wconn.F_exc, WEC1.wconn.F_exc);
+      annotation(
+        Line(points = {{-40, 30}, {-20, 30}, {-20, 0}, {40, 0}, {40, 0}}),
+        experiment(StartTime = 0, StopTime = 400, Tolerance = 1e-06, Interval = 0.1));
+    end sample1;
+    
+  end SampleSimulations;
+
 end OceanEngineeringToolbox;
 /* Source Code - END */
 
