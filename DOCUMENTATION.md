@@ -80,8 +80,8 @@ Input Matrix | `B1` | $N.s/m$
 Output Matrix | `C1` | $N.s/m$
 Feed-through / feed-forward Matrix | `D1` | $N.s/m$
 Wave Excitation Coefficient Frequencies | `w` | $rad/s$
-Wave excitation coefficient - real component | `FexcRe` | $N/m$
-Wave excitation coefficient - imaginary component | `FexcIm` | $N/m$
+Wave excitation coefficient - real component | `FexcRe` |
+Wave excitation coefficient - imaginary component | `FexcIm` |
 
 The OET does not currently support visualization capabilities. Hence, a geometry file is not required.
 
@@ -130,17 +130,22 @@ The OET does not currently support visualization capabilities. Hence, a geometry
 
 Parameter | Variable Name |Unit
 --- | :---: | :---:
-Time | `t` | $s$
-Wave elevation profile, ramped | `SSE` | $m$
+Simulation time | `t` | $s$
+Wave ramp time | `Trmp` | $s$
 Wave excitation force | `F_exc` | $N$
 Wave radiation force | `F_rad` | $N$
 Heave displacement response | `z` | $m$
 Heave velocity response | `v_z` | $m/s$
 Heave acceleration response | `a_z` | $m/s^2$
+Number of wave components | `n_omega` | $-$
 Wave frequency components | `omega` | $rad/s$
-Energy spectrum value | `S` | $m^2$
-Wave excitation coefficient - real component | `ExcCoeffRe` | $N/m$
-Wave excitation coefficient - imaginary component | `ExcCoeffIm` | $N/m$
+Wave energy spectrum value | `S` | $m^2$
+Amplitude of wave components | `zeta` | $m$
+Ramped amplitude of wave components | `zeta_rmp` | $m$
+Wave number of wave components | `k` | $m^{-1}$
+Wave elevation profile, ramped | `SSE` | $m$
+Wave excitation coefficient - real component | `ExcCoeffRe` |
+Wave excitation coefficient - imaginary component | `ExcCoeffIm` |
 
 10. These output variables can be exported to a CSV file for post-processing or data analysis. For users who wish to compare results with WEC-Sim, the variables must be selected in a specific order and then exported, so that the CSV output preserves this order. The default Modelica export file name `exportedVariables.csv` is used in `Processor.m`. The order of these variables are as follows:
 
