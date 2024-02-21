@@ -2,7 +2,7 @@
 The Ocean Engineering Toolbox (OET) is a Modelica library to simulate a single-body, floating Wave Energy Converter (WEC) in uni-directional, mono- and polychromatic waves.
 
 This is a work in progress. Current pre-release version: OET v0.2 (2024).
-[Documentation](https://ajay-menon-iitkgp.github.io/OET_Sys-MoDEL/) under construction. User guide available [here](https://github.com/ajay-menon-iitkgp/OET_Sys-MoDEL/wiki/Ocean-Engineering-Toolbox-(OET)-%E2%80%90-Modelica-Hydrodynamics-Library).
+[Documentation](https://ajay-menon-iitkgp.github.io/OET_Sys-MoDEL/) under construction. User guide available [here](DOCUMENTATION.md).
 
 #### Overview
 
