@@ -144,7 +144,7 @@ Wave elevation profile, ramped | `SSE` | $m$
 Wave excitation coefficient - real component | `ExcCoeffRe` |
 Wave excitation coefficient - imaginary component | `ExcCoeffIm` |
 
-10. These output variables can be exported to a CSV file for post-processing or data analysis. For users who wish to compare results with WEC-Sim, the variables must be selected in a specific order and then exported, so that the CSV output preserves this order. The default Modelica export file name `exportedVariables.csv` is used in `Processor.m`. The order of these variables are as follows:
+10. These output variables can be exported to a CSV file for post-processing or data analysis. For users who wish to compare results with WEC-Sim, the variables must be selected in a specific order and then exported, so that the CSV output preserves this order. The default Modelica export file name `exportedVariables.csv` is used in `Processor.m`. The order of these variables is as follows:
 
     - Time (`t`)
     - Wave elevation profile, ramped (`SSE`)
