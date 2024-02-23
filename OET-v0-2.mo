@@ -377,7 +377,7 @@ package OceanEngineeringToolbox
     /* Parameters & variables */
     parameter Modelica.Units.SI.Mass M = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/.../hydroCoeff.mat", "hydroCoeff.m33", 1, 1)) "Total mass of the body (including ballast)";
     parameter Modelica.Units.SI.Mass Ainf = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/.../hydroCoeff.mat", "hydroCoeff.Ainf33", 1, 1)) "Added mass at maximum (cut-off) frequency";
-    parameter Modelica.Units.SI.TranslationalSpringConstant C = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/.../hydroCoeff.mat", "hydroCoeff.Khs33", 1, 1)) "Hydrostatic stiffness";
+    parameter Modelica.Units.SI.TranslationalSpringConstant Khs = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/.../hydroCoeff.mat", "hydroCoeff.Khs33", 1, 1)) "Hydrostatic stiffness";
     parameter Real A1[2, 2] = Modelica.Utilities.Streams.readRealMatrix("D:/.../hydroCoeff.mat", "hydroCoeff.ss_rad33.A", 2, 2) "State matrix";
     parameter Real B1[1, 2] = transpose(Modelica.Utilities.Streams.readRealMatrix("D:/.../hydroCoeff.mat", "hydroCoeff.ss_rad33.B", 2, 1)) "Input matrix";
     parameter Real C1[1, 2] = Modelica.Utilities.Streams.readRealMatrix("D:/.../hydroCoeff.mat", "hydroCoeff.ss_rad33.C", 1, 2) "Output matrix";
@@ -406,7 +406,7 @@ package OceanEngineeringToolbox
     F_rad = (C1[1, 1]*x1) + (C1[1, 2]*x2) + (D1*v_z);
     
     /* Cummins' equation */
-    ((M + Ainf)*a_z) + F_rad + (C*z) = wconn.F_exc;
+    ((M + Ainf)*a_z) + F_rad + (Khs*z) = wconn.F_exc;
     
     /* Connector declarations */
     conn.F_rad = F_rad;
