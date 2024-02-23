@@ -38,8 +38,6 @@ This section outlines the workflow for the OET and a step-by-step guide on runni
 
 As a scientific programming language, Modelica requires a Modelica Solver Engine (MSE) to build and execute simulations. OpenModelica is an **open-source** MSE and the OET is developed to run primarily on it. By modifying the code annotations, other alternative engines such as MapleSim, Modelon, and Dymola can also be used. OpenModelica is easy to install and users are directed to download the latest version from its [website](https://openmodelica.org). The Modelica [Documentation](https://openmodelica.org/doc/OpenModelicaUsersGuide/1.22/) guide provides a detailed list of libraries, functionalities, and tutorials for new users to learn the language.
 
-To build a model from library components, users must define an instance of each component they will use. This can be done by referencing the relative address of the component in the library browser window. Examples of the instance definition used in the OET are:
-
 #### OET Files
 
 The OET consists of the following core files available under release v0.2:
