@@ -75,10 +75,10 @@ Parameter | Variable Name |Unit
 Total body mass | `M` | $kg$
 Added mass (infinite frequency) | `Ainf` | $kg$
 Hydrostatic stiffness | `C` | $N/m$
-State Matrix | `A1` | $N.s/m$
-Input Matrix | `B1` | $N.s/m$
-Output Matrix | `C1` | $N.s/m$
-Feed-through / feed-forward Matrix | `D1` | $N.s/m$
+State Matrix | `A` | $N.s/m$
+Input Matrix | `B` | $N.s/m$
+Output Matrix | `C` | $N.s/m$
+Feed-through Matrix | `D` | $N.s/m$
 Wave Excitation Coefficient Frequencies | `w` | $rad/s$
 Wave excitation coefficient - real component | `FexcRe` |
 Wave excitation coefficient - imaginary component | `FexcIm` |
