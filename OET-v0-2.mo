@@ -68,9 +68,9 @@ package OceanEngineeringToolbox
           Placement(transformation(extent = {{100, -10}, {120, 10}})));
         
         /*  Variable declarations */
-        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.FexcRe", 1, 260);
-        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.FexcIm", 1, 260);
-        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.w", 1, 260);
+        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.FexcRe", 1, 260);
+        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.FexcIm", 1, 260);
+        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.w", 1, 260);
         Real F_excRe[260] "Real component of excitation coefficient from BEMIO";
         Real F_excIm[260] "Imaginary component of excitation coefficient from BEMIO";
         Real w2[260] "Frequency distribution from BEMIO output file";
@@ -134,9 +134,9 @@ package OceanEngineeringToolbox
           Placement(transformation(extent = {{100, -10}, {120, 10}}))); */
         
         /*  Variable declarations */
-        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.FexcRe", 1, 260);
-        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.FexcIm", 1, 260);
-        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.w", 1, 260);
+        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.FexcRe", 1, 260);
+        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.FexcIm", 1, 260);
+        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.w", 1, 260);
         Real F_excRe[260] "Real component of excitation coefficient from BEMIO";
         Real F_excIm[260] "Imaginary component of excitation coefficient from BEMIO";
         Real w2[260] "Frequency distribution from BEMIO output file";
@@ -212,9 +212,9 @@ package OceanEngineeringToolbox
           Placement(transformation(extent = {{100, -10}, {120, 10}})));
         
         /*  Variable declarations */
-        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.FexcRe", 1, 260);
-        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.FexcIm", 1, 260);
-        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.w", 1, 260);
+        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.FexcRe", 1, 260);
+        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.FexcIm", 1, 260);
+        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.w", 1, 260);
         Real F_excRe[260] "Real component of excitation coefficient from BEMIO";
         Real F_excIm[260] "Imaginary component of excitation coefficient from BEMIO";
         Real w2[260] "Frequency distribution from BEMIO output file";
@@ -288,9 +288,9 @@ package OceanEngineeringToolbox
           Placement(transformation(extent = {{100, -10}, {120, 10}})));
         
         /*  Variable declarations */
-        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.FexcRe", 1, 260);
-        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.FexcIm", 1, 260);
-        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../PlateBEM.mat", "PlateBEM.w", 1, 260);
+        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.FexcRe", 1, 260);
+        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.FexcIm", 1, 260);
+        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.w", 1, 260);
         Real F_excRe[260] "Real component of excitation coefficient from BEMIO";
         Real F_excIm[260] "Imaginary component of excitation coefficient from BEMIO";
         Real w2[260] "Frequency distribution from BEMIO output file";
@@ -375,13 +375,13 @@ package OceanEngineeringToolbox
       Placement(transformation(extent = {{-10,90}, {10,110}})));
 
     /* Parameters & variables */
-    parameter Modelica.Units.SI.Mass M = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/.../bemData.mat", "bemData.m33", 1, 1)) "Total mass of the body (including ballast)";
-    parameter Modelica.Units.SI.Mass Ainf = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/.../bemData.mat", "bemData.Ainf33", 1, 1)) "Added mass at maximum (cut-off) frequency";
-    parameter Modelica.Units.SI.TranslationalSpringConstant C = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/.../bemData.mat", "bemData.Khs33", 1, 1)) "Hydrostatic stiffness";
-    parameter Real A1[2, 2] = Modelica.Utilities.Streams.readRealMatrix("D:/.../bemData.mat", "bemData.ss_rad33.A", 2, 2) "State matrix";
-    parameter Real B1[1, 2] = transpose(Modelica.Utilities.Streams.readRealMatrix("D:/.../bemData.mat", "bemData.ss_rad33.B", 2, 1)) "Input matrix";
-    parameter Real C1[1, 2] = Modelica.Utilities.Streams.readRealMatrix("D:/.../bemData.mat", "bemData.ss_rad33.C", 1, 2) "Output matrix";
-    parameter Real D1 = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/.../bemData.mat", "bemData.ss_rad33.D", 1, 1)) "Feedthrough / feedforward matrix";
+    parameter Modelica.Units.SI.Mass M = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/.../hydroCoeff.mat", "hydroCoeff.m33", 1, 1)) "Total mass of the body (including ballast)";
+    parameter Modelica.Units.SI.Mass Ainf = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/.../hydroCoeff.mat", "hydroCoeff.Ainf33", 1, 1)) "Added mass at maximum (cut-off) frequency";
+    parameter Modelica.Units.SI.TranslationalSpringConstant C = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/.../hydroCoeff.mat", "hydroCoeff.Khs33", 1, 1)) "Hydrostatic stiffness";
+    parameter Real A1[2, 2] = Modelica.Utilities.Streams.readRealMatrix("D:/.../hydroCoeff.mat", "hydroCoeff.ss_rad33.A", 2, 2) "State matrix";
+    parameter Real B1[1, 2] = transpose(Modelica.Utilities.Streams.readRealMatrix("D:/.../hydroCoeff.mat", "hydroCoeff.ss_rad33.B", 2, 1)) "Input matrix";
+    parameter Real C1[1, 2] = Modelica.Utilities.Streams.readRealMatrix("D:/.../hydroCoeff.mat", "hydroCoeff.ss_rad33.C", 1, 2) "Output matrix";
+    parameter Real D1 = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/.../hydroCoeff.mat", "hydroCoeff.ss_rad33.D", 1, 1)) "Feedthrough / feedforward matrix";
     
   Real x1;
     Real x2;
@@ -399,6 +399,8 @@ package OceanEngineeringToolbox
     v_z = der(z) "Heave velocity";
     a_z = der(v_z) "Heave acceleration";
 
+    /* CAUTION: This section fails when attempting matrix operations.
+       Manual element-wise multiplication required until fixed. */
     der(x1) = (A1[1, 1]*x1) + (A1[1, 2]*x2) + (B1[1, 1]*v_z);
     der(x2) = (A1[2, 1]*x1) + (A1[2, 2]*x2) + (B1[1, 2]*v_z);
     F_rad = (C1[1, 1]*x1) + (C1[1, 2]*x2) + (D1*v_z);
