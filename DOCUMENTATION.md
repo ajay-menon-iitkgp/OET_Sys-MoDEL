@@ -128,7 +128,7 @@ The OET does not currently support visualization capabilities. Hence, a geometry
     end Simulations;
     ```
 
-8.  With the components assembled, expand the library browser panel (GUI left) and right-select the simulation model. Click build and wait for the simulation to complete.
+8.  With the components assembled, expand the library browser panel (GUI left) and right-select the simulation model. Click `simulate` and wait for the simulation to complete.
 9.  Once the simulation is over, navigate to the 'Plot' tab (GUI bottom-right) and select the variables to view. Owing to the conversion of certain discrete variables to a continuous formulation, redundant intermediate variables may have been created. The following variables are of concern to users:
 
 Parameter | Variable Name |Unit
@@ -199,7 +199,7 @@ All files used in this tutorial are available in the `\tutorial` directory of th
 3. Navigate to the `OceanEngineeringToolbox\WaveProfile\IrregularWave\PiersonMoskowitzWave` model. Identify all instances of the `readRealMatrix()` function and change the file address to the full path address of the `hydroCoeff.mat` data structure.
 4. Navigate to the `OceanEngineeringToolbox\WEC` model and identify all instances of the `readRealMatrix()` function. Change the file address to the full path address of the `hydroCoeff.mat` data structure.
 5. Navigate to the `SampleSimulations` section. The existing `sample1` model connects an instance of the wave (PM1) to the body (WEC1). The `wconn` connector transfers the excitation force between both components.
-6. On the library browser panel of the OpenModelica GUI, expand the OET library, right-click `sample1` and select the build/simulate option. This executes the sample simulation.
+6. On the library browser panel of the OpenModelica GUI, expand the OET library, right-click `sample1` and select the `simulate` option. This executes the sample simulation.
 7. Once the simulation finishes, open the 'Plot' tab of the GUI to view the results.
 8. Navigate to the 'variable browser' pane. Using the variable nomenclature defined in the '[Getting Started](#getting-started)' section, select the output variables specified in point 10 of that section (in the same order).
 9. Select the `Export to CSV` option to save the results. If the user wishes to perform a comparison study in WEC-Sim, this CSV file must be saved in the same directory as the WEC-Sim simulation. The file name must be left to its default value (`exportedVariables.csv`).
