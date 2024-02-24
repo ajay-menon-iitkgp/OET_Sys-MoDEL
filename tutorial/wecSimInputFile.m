@@ -1,20 +1,16 @@
 %% Simulation Data
 simu = simulationClass();                       % Initialize simulationClass
-simu.simMechanicsFile = 'floatLineAttenuator.slx';            % Simulink Model File
+simu.simMechanicsFile = 'float.slx';            % Simulink Model File
 simu.startTime = 0;                             % Simulation Start Time [s]
 simu.rampTime = 100;                            % Wave Ramp Time [s]
 simu.endTime = 400;                             % Simulation End Time [s]   
 simu.dt = 0.1;                                  % Simulation Time-Step [s]
 
 %% Wave Information
-% % Regular Waves 
-% waves = waveClass('regular');                   % Initialize waveClass                                 
-% waves.height = 2.5;                                  % Wave Height [m]
-% waves.period = 8;                                    % Wave Period [s]
-
 % Waves with imported wave elevation time-history  
 waves = waveClass('elevationImport');          % Create the Wave Variable and Specify Type
 waves.elevationFile = 'elevationData.mat';     % Name of User-Defined Time-Series File [:,2] = [time, eta]
+simu.stateSpace = 1;                           % Turn on State Space
 
 %% Body Data
 % Float Body
