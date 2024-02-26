@@ -67,10 +67,12 @@ package OceanEngineeringToolbox
         Modelica.Blocks.Interfaces.RealOutput F_exc "Wave excitation time series" annotation(
           Placement(transformation(extent = {{100, -10}, {120, 10}})));
         
+        parameter String fileName;
+        
         /*  Variable declarations */
-        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.FexcRe", 1, 260);
-        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.FexcIm", 1, 260);
-        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.w", 1, 260);
+        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcRe", 1, 260);
+        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcIm", 1, 260);
+        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.w", 1, 260);
         Real F_excRe[260] "Real component of excitation coefficient from BEMIO";
         Real F_excIm[260] "Imaginary component of excitation coefficient from BEMIO";
         Real w2[260] "Frequency distribution from BEMIO output file";
@@ -133,10 +135,12 @@ package OceanEngineeringToolbox
         /* Modelica.Blocks.Interfaces.RealOutput F_exc "Wave time series" annotation(
           Placement(transformation(extent = {{100, -10}, {120, 10}}))); */
         
+        parameter String fileName;
+        
         /*  Variable declarations */
-        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.FexcRe", 1, 260);
-        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.FexcIm", 1, 260);
-        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.w", 1, 260);
+        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcRe", 1, 260);
+        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcIm", 1, 260);
+        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.w", 1, 260);
         Real F_excRe[260] "Real component of excitation coefficient from BEMIO";
         Real F_excIm[260] "Imaginary component of excitation coefficient from BEMIO";
         Real w2[260] "Frequency distribution from BEMIO output file";
@@ -211,10 +215,12 @@ package OceanEngineeringToolbox
         Modelica.Blocks.Interfaces.RealOutput F_exc "Wave time series" annotation(
           Placement(transformation(extent = {{100, -10}, {120, 10}})));
         
+        parameter String fileName;
+        
         /*  Variable declarations */
-        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.FexcRe", 1, 260);
-        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.FexcIm", 1, 260);
-        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.w", 1, 260);
+        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcRe", 1, 260);
+        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcIm", 1, 260);
+        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.w", 1, 260);
         Real F_excRe[260] "Real component of excitation coefficient from BEMIO";
         Real F_excIm[260] "Imaginary component of excitation coefficient from BEMIO";
         Real w2[260] "Frequency distribution from BEMIO output file";
@@ -287,10 +293,12 @@ package OceanEngineeringToolbox
         Modelica.Blocks.Interfaces.RealOutput F_exc "Wave time series" annotation(
           Placement(transformation(extent = {{100, -10}, {120, 10}})));
         
+        parameter String fileName;
+        
         /*  Variable declarations */
-        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.FexcRe", 1, 260);
-        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.FexcIm", 1, 260);
-        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix("F:/.../hydroCoeff.mat", "hydroCoeff.w", 1, 260);
+        Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcRe", 1, 260);
+        Real Fexc_Im[1, :] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcIm", 1, 260);
+        Real w[1, :] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.w", 1, 260);
         Real F_excRe[260] "Real component of excitation coefficient from BEMIO";
         Real F_excIm[260] "Imaginary component of excitation coefficient from BEMIO";
         Real w2[260] "Frequency distribution from BEMIO output file";
@@ -373,15 +381,17 @@ package OceanEngineeringToolbox
       Placement(transformation(extent = {{-90, -10}, {-110, 10}})));
     OceanEngineeringToolbox.Connectors.DataCollector conn() "Connector for velocity and radiation force" annotation(
       Placement(transformation(extent = {{-10,90}, {10,110}})));
-
+    
+    parameter String fileName;
+    
     /* Parameters & variables */
-    parameter Modelica.Units.SI.Mass M = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/.../hydroCoeff.mat", "hydroCoeff.m33", 1, 1)) "Total mass of the body (including ballast)";
-    parameter Modelica.Units.SI.Mass Ainf = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/.../hydroCoeff.mat", "hydroCoeff.Ainf33", 1, 1)) "Added mass at maximum (cut-off) frequency";
-    parameter Modelica.Units.SI.TranslationalSpringConstant Khs = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/.../hydroCoeff.mat", "hydroCoeff.Khs33", 1, 1)) "Hydrostatic stiffness";
-    parameter Real A1[2, 2] = Modelica.Utilities.Streams.readRealMatrix("D:/.../hydroCoeff.mat", "hydroCoeff.ss_rad33.A", 2, 2) "State matrix";
-    parameter Real B1[1, 2] = transpose(Modelica.Utilities.Streams.readRealMatrix("D:/.../hydroCoeff.mat", "hydroCoeff.ss_rad33.B", 2, 1)) "Input matrix";
-    parameter Real C1[1, 2] = Modelica.Utilities.Streams.readRealMatrix("D:/.../hydroCoeff.mat", "hydroCoeff.ss_rad33.C", 1, 2) "Output matrix";
-    parameter Real D1 = scalar(Modelica.Utilities.Streams.readRealMatrix("D:/.../hydroCoeff.mat", "hydroCoeff.ss_rad33.D", 1, 1)) "Feedthrough / feedforward matrix";
+    parameter Modelica.Units.SI.Mass M = scalar(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.m33", 1, 1)) "Total mass of the body (including ballast)";
+    parameter Modelica.Units.SI.Mass Ainf = scalar(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.Ainf33", 1, 1)) "Added mass at maximum (cut-off) frequency";
+    parameter Modelica.Units.SI.TranslationalSpringConstant Khs = scalar(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.Khs33", 1, 1)) "Hydrostatic stiffness";
+    parameter Real A1[2, 2] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.ss_rad33.A", 2, 2) "State matrix";
+    parameter Real B1[1, 2] = transpose(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.ss_rad33.B", 2, 1)) "Input matrix";
+    parameter Real C1[1, 2] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.ss_rad33.C", 1, 2) "Output matrix";
+    parameter Real D1 = scalar(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.ss_rad33.D", 1, 1)) "Feedthrough / feedforward matrix";
     
   Real x1;
     Real x2;
@@ -567,8 +577,8 @@ package OceanEngineeringToolbox
     
     model sample1
       /* Single body, irregular waves with PM spectrum */
-      OceanEngineeringToolbox.WaveProfile.IrregularWave.PiersonMoskowitzWave PM1;
-      OceanEngineeringToolbox.WEC WEC1;
+      OceanEngineeringToolbox.WaveProfile.IrregularWave.PiersonMoskowitzWave PM1(fileName = "F:/.../hydroCoeff.mat");
+      OceanEngineeringToolbox.WEC WEC1(fileName = "F:/.../hydroCoeff.mat");
     equation
       connect(PM1.wconn.F_exc, WEC1.wconn.F_exc);
       annotation(
