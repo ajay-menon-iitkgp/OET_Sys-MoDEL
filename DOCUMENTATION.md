@@ -3,9 +3,6 @@
 The Ocean Engineering Toolbox (OET) is an open-source Modelica library to simulate a single-body, floating, rigid body in uni-directional waves (mono- and polychromatic). The library is under development and currently in pre-release version 0.2. A typical use case for the OET is the simulation of freely-floating wave energy conversion devices. This documentation covers the installation and usage of v0.2 when running the OpenModelica (OMEdit) solver engine.
 
 > [!WARNING]
-> The repository's `tutorial` directory is currently being populated and is incomplete. - \[23 February 2024\]
-
-> [!WARNING]
 > The state-space BEMIO import statements in `Processor.m` are under construction. Users must manually enter the SS matrices or use the tutorial `hydroCoeff.mat` file when simulating the RM3 float. - \[25 February 2024\]
 
 Quick links:
