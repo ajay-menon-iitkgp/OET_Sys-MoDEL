@@ -19,6 +19,13 @@ Modelica is a symbolic programming language developed by the Modelica Associatio
 
 The Cummins equation is selected for the OET as an appropriate frequency-dependent formulation of floating structures. The radiation and excitation forces are represented by convolution integrals and have been succesfully implemented in v0.1 and v0.2 respectively using a State-Space approach. All results are validated against the WEC-Sim time-domain solver developed in SimScape (read about WEC-Sim [here](https://github.com/WEC-Sim/WEC-Sim)).
 
+For the excitation wave, the user can select from one of four models:
+
+- Regular, uni-directional wave
+- Irregular, uni-directional wave - Pierson Moskowitz spectrum
+- Irregular, uni-directional wave - Bretschneider spectrum
+- Irregular, uni-directional wave - JONSWAP spectrum
+
 #### Development Team
 The OET is a research product from the Sys-MoDEL group at the University of New Brunswick (Fredericton), Canada. Current members of the development team are:
 
@@ -59,7 +66,7 @@ Both files must be downloaded locally to run the OET.
 > In place of `OET.mo`, you may find an equivalent `OET-vX-Y.mo` Modelica file, where X.Y is the release number. For example, `OET-v0-2.mo` is the code for version 0.2. For simplicity, this documentation henceforth refers to the library source code as `OET.mo` irrespective of the version.
 
 > [!CAUTION]
-> Always execute `Processor.m` using MATLAB's `Run Section and Advance` option, not `Run`. This is because the `preProcessor` and `postProcessor` scripts are different sections in the same file.
+> Always execute `Processor.m` using MATLAB's `Run Section` or `Run and Advance` option, NOT `Run`. This is because the `preProcessor` and `postProcessor` scripts are different sections in the same file.
 
 > [!IMPORTANT]
 > Users require a MATLAB license to run the `Processor.m` script and may require additional toolboxes if they wish to run the WEC-Sim toolbox/BEMIO Code in SimScape.
@@ -91,42 +98,52 @@ The OET does not currently support visualization capabilities. Hence, a geometry
 #### Step-by-Step Guide
 
 1. Download `OET.mo` and `Processor.m`.
-2. For a chosen geometry, run a diffraction analysis/BEM tool that is compatible with BEMIO (Capytaine, Nemoh, etc.).
+2. For a chosen geometry, run a diffraction analysis/BEM tool that is compatible with BEMIO (Capytaine, Nemoh, Aqwa, WAMIT).
 3. Run BEMIO on the BEM output of a chosen geometry to generate an HDF file of the hydrostatic and hydrodynamics coefficients/parameters.
-4. Run only the `preProcessor` section of the `Processor.m` file. The required parameters are saved to a structure `hydroCoeff.mat` in the user's MATLAB current directory.
-5. Startup OpenModelica and import the OET as a library file.
-6. Find all instances of `Modelica.Utilities.Streams.readRealMatrix("file-address/hydroCoeff.mat", "hydroCoeff.variable", size1, size2)` by searching for the function `readRealMatrix` in the library source code. Replace `file-address` with the the full path for `hydroCoeff.mat`. For variable names, refer to [this table](#input-file) and follow the same nomenclature. Refer to the HDF file to identify numeric values for `size1` and `size` of the variable. For a scalar variable (not an array/list), set both sizes to `1`. For example, the below code block reads the real component of the excitation coefficient as a 260-element vector (size 1 * 260).
-   ```modelica
-   Real Fexc_Re[1, :] = Modelica.Utilities.Streams.readRealMatrix("C:/hydroCoeff.mat", hydroCoeff.FexcRe, 1, 260)
-   ```
-
-7. In the `OceanEngineeringToolbox/Simulations` directory, the user can perform a custom simulation by creating a model. Building a simulation consists of connecting a chosen wave excitation component (regular or from a choice of three irregular spectra) to the WEC component. To do so, create a new model and populate it with instances of the required components. Then, connect the data ports (or *connectors*) of both components using the `connect()` function. The following examples illustrate this process to create simulation models,
+4. Run only the `preProcessor` section of the `Processor.m` file. The required parameters are saved to a structure `hydroCoeff.mat` in the user's current MATLAB directory.
+5. Startup OpenModelica and import the OET library source code (`OET.mo`).
+6. In the `OceanEngineeringToolbox/Simulations` directory, the user can perform a custom simulation by creating a model. Building a simulation consists of connecting a chosen wave excitation component (regular or from a choice of three irregular spectra) to the WEC component. To do so, create a new model and populate it with instances of the required components. Then, connect the data ports (or *connectors*) of both components using the `connect()` function. The user must input the full path for the `hydroCoeff.mat` file in the parameter `String filePath`.
+7. The specifications of a component can be changed within the model by explicitly defining any variables marked as a 'parameter' in the component source code. For instance, the significant height (`Hs`), number of wave frequency components (`n_omega`), and the ramp time (`Trmp`) are three parameters in the irregular wave profile package (the regular wave package sets `n_omega = 1`). A default value for each parameter is provided in the component source code, but a user-defined value can be specified when creating an instance of the wave profile component. The following examples illustrate this and the previous step, and users can append other parameters in a similar fashion:
     ```modelica
     package Simulations
 
         /* Model to simulate a body in regular waves */
         model sample1
-            OceanEngineeringToolbox.WaveProfile.RegularWave.AiryWave Reg1;
-            OceanEngineeringToolbox.WEC WEC1;
+            parameter String filePath = "F:/.../hydroCoeff.mat";          /* Edit this parameter to full path of hydroCoeff.mat */
+            OceanEngineeringToolbox.WaveProfile.RegularWave.AiryWave Reg1(fileName = filePath, Hs = 5, Trmp = 50);    /* Edit component parameters if required */
+            OceanEngineeringToolbox.WEC WEC1(fileName = filePath);        /* WEC1 instance of WEC component initialized */
 
             equation
-              connect(Reg1.wconn.F_exc, WEC1.wconn.F_exc);
+                connect(Reg1.wconn.F_exc, WEC1.wconn.F_exc);              /* Components connected */
+                annotation(...);                                          /* Edit the annotation to control the simulation parameters */
         end sample1;
 
         /* Model to simulate a body in irregular waves - Pierson Moskowitz spectrum */
         model sample2
-            OceanEngineeringToolbox.WaveProfile.IrregularWave.PiersonMoskowitzWave PM1;
-            OceanEngineeringToolbox.WEC WEC1;
+            parameter String filePath = "F:/.../hydroCoeff.mat";
+            OceanEngineeringToolbox.WaveProfile.IrregularWave.PiersonMoskowitzWave PM1(fileName = filePath, Hs = 2.5, n_omega = 100, Trmp = 100);    /* Additional 'n_omega' parameter for irregular waves */
+            OceanEngineeringToolbox.WEC WEC2(fileName = filePath);
 
             equation
-              connect(PM1.wconn.F_exc, WEC1.wconn.F_exc);
+                connect(PM1.wconn.F_exc, WEC2.wconn.F_exc);
+                annotation(...);
         end sample2;
 
     end Simulations;
     ```
 
-8.  With the components assembled, expand the library browser panel (GUI left) and right-select the simulation model. Click `simulate` and wait for the simulation to complete.
-9.  Once the simulation is over, navigate to the 'Plot' tab (GUI bottom-right) and select the variables to view. Owing to the conversion of certain discrete variables to a continuous formulation, redundant intermediate variables may have been created. The following variables are of concern to users:
+> [!IMPORTANT]
+> Note, that simulation parameters must stay fixed for the duration of the simulation, but can be modified between simulations. For instance, the value of `Hs` differs between `sample1` and `sample2` (two different simulations). When the user simulates a model, this value must stay constant and cannot be modified mid-simulation.
+
+8. To change the simulation parameters, the user must modify the `annotation(...)` section of each model. The user must use caution when attempting to modify other parameters (such as the solver or integration methods). The following parameters can be edited:
+
+    - `StartTime` - Virtual start time of the simulation (default = 0 seconds)
+    - `StopTime` - Virtual simulation duration incremented to `StartTime` (default = 400 seconds)
+    - `Interval` - Time step (default = 0.1 seconds)
+    - `Tolerance` - Integration tolerance (default 1e-06)
+
+9. Expand the library browser panel (GUI left), right-select the user-defined simulation model (`sample1` in the above example), and select the `simulate` option to build the model.
+10. Once the simulation is over, navigate to the 'Plot' tab (GUI bottom-right) and select the variables to view. Owing to the conversion of certain discrete variables to a continuous formulation, hundreds of redundant intermediate variables may have been created. The following variables are of concern to users and can be found using the search bar on the variables panel:
 
 Parameter | Variable Name |Unit
 --- | :---: | :---:
@@ -147,7 +164,7 @@ Wave elevation profile, ramped | `SSE` | $m$
 Wave excitation coefficient - real component | `ExcCoeffRe` |
 Wave excitation coefficient - imaginary component | `ExcCoeffIm` |
 
-10. These output variables can be exported to a CSV file for post-processing or data analysis. For users who wish to compare results with WEC-Sim, the variables must be selected in a specific order and then exported, so that the CSV output preserves this order. The default Modelica export file name `exportedVariables.csv` is used in `Processor.m`. The order of these variables is as follows:
+11. These output variables can be exported to a CSV file for post-processing or data analysis. For users who wish to compare results with WEC-Sim, the variables must be selected in a specific order and then exported, so that the CSV output preserves this order. The default Modelica export file name `exportedVariables.csv` is used in `Processor.m`. The order of these variables is as follows:
 
     - Time (`t`)
     - Wave elevation profile, ramped (`SSE`)
@@ -157,9 +174,9 @@ Wave excitation coefficient - imaginary component | `ExcCoeffIm` |
     - Heave velocity response (`v_z`)
     - Heave acceleration response (`a_z`)
 
-11. The `postProcessor` script is divided into multiple sections that must be run sequentially. Script 1 generates an `elevationData.mat` file in the current MATLAB directory. This is the WaveClass input for WEC-Sim to simulate using the same wave profile generated by the OET.
-12. Script 2 provides important instructions for the user on setting up the WEC-Sim simulation and then executes WEC-Sim in the current directory when run.
-13. Script 3 plots the time series comparisons of various aspects of the simulation (forces and responses) between the OET (from the CSV file) and WEC-Sim. The figures generated by this section are:
+12. The `postProcessor` script is divided into multiple sections that must be run sequentially. Script 1 generates an `elevationData.mat` file in the current MATLAB directory. This is the WaveClass input for WEC-Sim to simulate using the same wave profile generated by the OET.
+13. Script 2 provides important instructions for the user on setting up the WEC-Sim simulation and then executes WEC-Sim in the current directory when run. These instructions are furthered explained in the tutorial below.
+14. Script 3 plots the time series comparisons of various aspects of the simulation (forces and responses) between the OET (from the CSV file) and WEC-Sim. The figures generated by this section are:
 
     - Wave elevation profile (1)
     - Wave heave excitation force (2.1)
@@ -208,7 +225,10 @@ All files used in this tutorial are available in the `\tutorial` directory of th
 2. In the `PostProcessor Script - 1` section, ensure that the CSV file specified in the filename argument of `readmatrix()` is present in the working WEC-Sim directory. Make this the current MATLAB directory.
 3. Run this section to generate the wave elevation time series data structure, labelled `elevationData.mat`, and saved to the current directory.
 4. Prior to running the `PostProcessor Script - 2` section, the user must setup the WEC-Sim simulation. This entails the following steps:
-    - x
-    - x
-5. Run the WEC-Sim simulation by either running the `wecSim` command on the MATLAB command line when the user is in the correct simulation directory, or navigate to that directory and run the `PostProcessor Script - 2` section.
-6. Once the WEC-Sim simulation finishes, the user can plot a series of comparisons by running the `PostProcessor Script - 3` section. Their results can be compared against the sample plots for the RM3 float geometry in the `\Tutorial` directory.
+
+    - In `wecSimInputFile.m`, uncomment the `elevationImport` wave class and comment out all other wave classes. Ensure that `waves.elevationFile = 'elevationData.mat';` is defined.
+    - Verify that the `elevationData.mat` and `exportedVariables.csv` files are in the same `$CASE` directory as the WEC-Sim simulation.
+    - The remaining setup involves a standard WEC-Sim workflow - create a Simulink model, create the `hydroData` and `geometry` directories with the `$CASE` directory, save the HDF5 output file to `hydroData` and the geometry '*.stl' mesh file to `geometry`, and create the `userDefinedFunctions.m` file if required.
+
+5. Run the WEC-Sim simulation by either running the `wecSim` command on the MATLAB command line when the user is in the correct simulation directory (`$CASE`), or run the `PostProcessor Script - 2 (cont'd)` section of `Processor.m`.
+6. Once the WEC-Sim simulation finishes, the user can plot a series of comparisons by running the `PostProcessor Script - 3` section. Sample plots are included in the `\Tutorial\Validation Images` directory of this repository.
