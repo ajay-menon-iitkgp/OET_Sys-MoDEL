@@ -30,7 +30,7 @@ For the excitation wave, the user can select from one of four models:
 Repository directory:
 
 - `OET.mo` - OET library source code (Modelica)
-- `Processor.m` - MATLAB pre- and post-processing script
+- `Processor.m` - Pre- and post-processing script (Matlab)
 - `DOCUMENTATION.md` - User guide (Markdown)
 - `\tutorial` - Sub-directory containing example files
 - `\Previous Versions` - Sub-directory with previous OET versions (not maintained)
