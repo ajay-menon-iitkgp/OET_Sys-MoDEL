@@ -10,7 +10,7 @@ Literature demonstrates the requirement for fequency-dependent models, and the C
 Repository directory:
 
 - `OET.mo` - OET library source code (Modelica)
-- `Processor.m` - MATLAB pre- and post-processing script
+- `Processor.m` - Pre- and post-processing script (Matlab)
 - `DOCUMENTATION.md` - User guide (Markdown)
 - `\tutorial` - Sub-directory containing example files
 - `\Previous Versions` - Sub-directory with previous OET versions (not maintained)
