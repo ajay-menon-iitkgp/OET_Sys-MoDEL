@@ -534,7 +534,7 @@ package OceanEngineeringToolbox
     model sample1
       /* Single body, regular waves */
       
-      parameter String filePath = "D:/Ocean Toolbox/Sanitized version/hydroCoeff.mat";
+      parameter String filePath = "C:/.../hydroCoeff.mat";
       OceanEngineeringToolbox.WaveProfile.RegularWave.LinearWave Reg1(fileName = filePath, Hs = 2.5, Trmp = 50);
       OceanEngineeringToolbox.Structures.WEC WEC1(fileName = filePath);
     equation
@@ -547,7 +547,7 @@ package OceanEngineeringToolbox
     model sample2
       /* Single body, irregular waves with PM spectrum */
       
-      parameter String filePath = "D:/Ocean Toolbox/Sanitized version/hydroCoeff.mat";
+      parameter String filePath = "C:/.../hydroCoeff.mat";
       OceanEngineeringToolbox.WaveProfile.IrregularWave.PiersonMoskowitzWave PM1(fileName = filePath, Hs = 2.5, n_omega = 100, Trmp = 50);
       OceanEngineeringToolbox.Structures.WEC WEC1(fileName = filePath);
     equation
