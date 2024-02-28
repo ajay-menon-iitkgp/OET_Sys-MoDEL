@@ -344,17 +344,15 @@ package OceanEngineeringToolbox
     
     /* Parameters & variables */
     parameter String fileName;
-    
     parameter Modelica.Units.SI.Mass M = scalar(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.m33", 1, 1)) "Total mass of the body (including ballast)";
     parameter Modelica.Units.SI.Mass Ainf = scalar(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.Ainf33", 1, 1)) "Added mass at maximum (cut-off) frequency";
     parameter Modelica.Units.SI.TranslationalSpringConstant Khs = scalar(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.Khs33", 1, 1)) "Hydrostatic stiffness";
     
     Real A1[2, 2] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.ss_rad33.A", 2, 2) "State matrix";
-    Real B1[1, 2] = transpose(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.ss_rad33.B", 2, 1)) "Input matrix";
+    Real B1[2, 1] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.ss_rad33.B", 2, 1) "Input matrix";
     Real C1[1, 2] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.ss_rad33.C", 1, 2) "Output matrix";
     Real D1 = scalar(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.ss_rad33.D", 1, 1)) "Feedthrough matrix";
-    Real x1;
-    Real x2;
+    Real x[2,1] "State-space intermediate variables";
     Modelica.Units.SI.Length z "Heave displacement";
     Modelica.Units.SI.Velocity v_z "Heave velocity";
     Modelica.Units.SI.Acceleration a_z "Heave acceleration";
@@ -368,12 +366,10 @@ package OceanEngineeringToolbox
   equation
     v_z = der(z) "Heave velocity";
     a_z = der(v_z) "Heave acceleration";
-
-    /* CAUTION: This section fails when attempting matrix operations.
-       Manual element-wise multiplication required until fixed. */
-    der(x1) = (A1[1, 1]*x1) + (A1[1, 2]*x2) + (B1[1, 1]*v_z);
-    der(x2) = (A1[2, 1]*x1) + (A1[2, 2]*x2) + (B1[1, 2]*v_z);
-    F_rad = (C1[1, 1]*x1) + (C1[1, 2]*x2) + (D1*v_z);
+    
+    /* Radiation force state-space model */
+    der(x) = (A1*x) + (B1*v_z);
+    F_rad = scalar(C1*x) + (D1*v_z);
 
     /* Assemble Cummins' equation */
     ((M + Ainf)*a_z) + F_rad + (Khs*z) = wconn.F_exc;
