@@ -20,7 +20,7 @@
      |  
      |->  Wave Profile (PACKAGE)
      |    |-> Regular Wave (PACKAGE)
-     |    |   |-> LinearModel (MODEL)               [!- Monochromatic regular wave]
+     |    |   |-> LinearModel (MODEL)                     [!- Monochromatic regular wave]
      |    |
      |    |-> Irregular Wave (PACKAGE)
      |    |   |-> Pierson Moskowitz Spectrum (MODEL)      [!- Fully-developed sea state]
@@ -28,7 +28,7 @@
      |    |   |-> JONSWAP Spectrum (MODEL)                [!- Developing sea state with limited fetch]
      |    |
      |->  Structures (PACKAGE)
-     |    |-> WEC (MODEL)                       [!- Solves motion through the Cummins equation]
+     |    |-> WEC (MODEL)                                 [!- Solves motion through the Cummins equation]
      |
      |->  Functions (PACKAGE)
      |    |-> waveNumber (FUNCTION)                       [!- Wave number iterations from frequency and depth]
@@ -44,10 +44,8 @@
           |-> DataCollector (CONNECTOR)                   [!- Transfer WEC dynamics - velocity and radiation force]
 */
 
-/* Source Code */
-
 package OceanEngineeringToolbox
-  extends Modelica.Icons.Package;   /*  Library visibility */
+  extends Modelica.Icons.Package;
 
   package WaveProfile
   
@@ -55,7 +53,10 @@ package OceanEngineeringToolbox
       /* Package for regular wave elevation profile and excitation force calculations */
 
       model LinearWave
-        /*  Wave elevation profile and excitation force */
+        /*  Implementation of linear Airy wave model.
+            Excitation force transferred through 'wconn'.
+            Elevation profile is local and not transferred.
+        */
         
         extends Modelica.Blocks.Icons.Block;
         import Modelica.Math.Vectors;
@@ -65,13 +66,20 @@ package OceanEngineeringToolbox
         constant Real pi = Modelica.Constants.pi "Mathematical constant pi";
         constant Real g = Modelica.Constants.g_n "Acceleration due to gravity";
         
-        /*  Variable declarations */
-        parameter String fileName;
+        /*  'wDims' is 2-element vector of size of hydroCoeff frequency vector [1, size].
+            Convert to scalar 'parameter Integer wSize' to pass as argument to readRealMatrix().
+            The first matrix dimension is size=1 since w, F_excRe, and F_excIm are vectors.
+            Size of w (frequency vector) is passed as argument for F_excRe and F_excIm also.
+        */
+        parameter String fileName "Address of hydroCoeff.mat file";
+        parameter Integer wDims[:] = Modelica.Utilities.Streams.readMatrixSize(fileName, "hydroCoeff.w");
+        parameter Integer wSize = wDims[2];
         
-        parameter Real F_excRe[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcRe", 1, 260));
-        parameter Real F_excIm[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcIm", 1, 260));
-        parameter Real w[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.w", 1, 260));
+        parameter Real F_excRe[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcRe", 1, wSize));
+        parameter Real F_excIm[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcIm", 1, wSize));
+        parameter Real w[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.w", 1, wSize));
         
+        /* Variable declarations */
         parameter Modelica.Units.SI.Length d = 100 "Water depth";
         parameter Modelica.Units.SI.Density rho = 1025 "Density of seawater";
         parameter Modelica.Units.SI.Length Hs = 2.5 "Significant Wave Height";
@@ -87,21 +95,21 @@ package OceanEngineeringToolbox
         Modelica.Units.SI.Length SSE_unramp "Unramped sea surface elevation";
       
       equation
-        /* Define amplitude for each frequency component - ramp time */
+        /* Define amplitude for ramp duration */
         if time < Trmp then
           zeta_rmp = sin(pi/2*time/Trmp)*zeta;
         else
           zeta_rmp = zeta;
         end if;
         
-        /* Interpolate excitation coefficients (Re & Im) for each frequency component */
+        /* Interpolate excitation coefficients (Re & Im) for wave frequency */
         ExcCoeffRe = Modelica.Math.Vectors.interpolate(w, F_excRe, omega);
         ExcCoeffIm = Modelica.Math.Vectors.interpolate(w, F_excIm, omega);
 
         /* Define wave elevation profile (SSE) and excitation force */
         SSE = zeta_rmp*cos(omega*time);
         SSE_unramp = zeta*cos(omega*time);
-        wconn.F_exc = ((ExcCoeffRe*zeta_rmp*cos(omega*time)) - (ExcCoeffIm*zeta_rmp*sin(omega*time)))*rho*g;
+        wconn.F_exc = ((ExcCoeffRe*zeta_rmp*cos(omega*time))-(ExcCoeffIm*zeta_rmp*sin(omega*time)))*rho*g;
         
         annotation(
           Icon(graphics = {Line(origin = {-50.91, 48.08}, points = {{-33.2809, -22.5599}, {-21.2809, -20.5599}, {-13.2809, 27.4401}, {6.71907, -20.5599}, {24.7191, -24.5599}, {42.7191, -24.5599}, {44.7191, -24.5599}}, color = {255, 0, 0}, smooth = Smooth.Bezier), Line(origin = {-37, 51}, points = {{-51, 29}, {-51, -29}, {37, -29}}), Text(origin = {6, 55}, extent = {{-40, 17}, {40, -17}}, textString = "Hs"), Line(origin = {22, 4}, points = {{0, 22}, {0, -22}}, thickness = 1, arrow = {Arrow.None, Arrow.Filled}), Line(origin = {-7.57, -61.12}, points = {{-82.4341, -12.8774}, {-76.4341, -2.87735}, {-72.4341, -6.87735}, {-62.4341, 13.1226}, {-50.4341, -26.8774}, {-46.4341, -20.8774}, {-38.4341, -26.8774}, {-34.4341, -18.8774}, {-34.4341, 3.12265}, {-26.4341, 1.12265}, {-20.4341, 7.12265}, {-12.4341, 9.12265}, {-8.43408, 19.1226}, {1.56592, -4.87735}, {7.56592, -24.8774}, {19.5659, -6.87735}, {21.5659, 9.12265}, {31.5659, 13.1226}, {39.5659, -0.87735}, {43.5659, 11.1226}, {55.5659, 15.1226}, {63.5659, 27.1226}, {79.5659, -22.8774}}, color = {0, 0, 255}, smooth = Smooth.Bezier), Rectangle(origin = {100, 0}, fillColor = {85, 255, 127}, fillPattern = FillPattern.Solid, extent = {{-20, 20}, {20, -20}})}, coordinateSystem(initialScale = 0.1)),
@@ -114,28 +122,33 @@ package OceanEngineeringToolbox
       /* Package for irregular wave elevation profile and excitation force calculations */
 
       model PiersonMoskowitzWave
-        /*  Pierson Moskowitz Spectrum - Wave elevation profile and excitation force */
+        /*  Implements Pierson Moskowitz (PM) energy spectrum.
+            Excitation force transferred through 'wconn'.
+            Elevation profile is local and not transferred.
+        */
         
         extends Modelica.Blocks.Icons.Block;
         import Modelica.Math.Vectors;
         OceanEngineeringToolbox.Internal.Connectors.WaveOutConn wconn;
-        
-        /* Modelica.Blocks.Interfaces.RealOutput F_exc "Wave time series" annotation(
-                  Placement(transformation(extent = {{100, -10}, {120, 10}}))); */
-        
+                
         /* Environmental constants */
         constant Real pi = Modelica.Constants.pi "Mathematical constant pi";
         constant Real g = Modelica.Constants.g_n "Acceleration due to gravity";
         
-        /*  Variable declarations */
-        parameter String fileName;
+        /*  'wDims' is 2-element vector of size of hydroCoeff frequency vector [1, size].
+            Convert to scalar 'parameter Integer wSize' to pass as argument to readRealMatrix().
+            The first matrix dimension is size=1 since w, F_excRe, and F_excIm are vectors.
+            Size of w (frequency vector) is passed as argument for F_excRe and F_excIm also.
+        */
+        parameter String fileName "Address of hydroCoeff.mat file";
+        parameter Integer wDims[:] = Modelica.Utilities.Streams.readMatrixSize(fileName, "hydroCoeff.w");
+        parameter Integer wSize = wDims[2];
         
-        // Integer varSize[:] = Modelica.Utilities.Streams.readMatrixSize(fileName, "hydroCoeff.FexcRe");
+        parameter Real F_excRe[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcRe", 1, wSize));
+        parameter Real F_excIm[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcIm", 1, wSize));
+        parameter Real w[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.w", 1, wSize));
         
-        parameter Real F_excRe[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcRe", 1, 260));
-        parameter Real F_excIm[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcIm", 1, 260));
-        parameter Real w[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.w", 1, 260));
-        
+        /* Variable declarations */
         parameter Modelica.Units.SI.Length d = 100 "Water depth";
         parameter Modelica.Units.SI.Density rho = 1025 "Density of seawater";
         parameter Modelica.Units.SI.Length Hs = 2.5 "Significant Wave Height";
@@ -188,7 +201,10 @@ package OceanEngineeringToolbox
       end PiersonMoskowitzWave;
 
       model BrettschneiderWave
-        /*  Brettschneider Spectrum - Wave elevation profile and excitation force */
+        /*  Implements Brettschneider energy spectrum.
+            Excitation force transferred through 'wconn'.
+            Elevation profile is local and not transferred.
+        */
         
         extends Modelica.Blocks.Icons.Block;
         import Modelica.Math.Vectors;
@@ -198,13 +214,20 @@ package OceanEngineeringToolbox
         constant Real pi = Modelica.Constants.pi "Mathematical constant pi";
         constant Real g = Modelica.Constants.g_n "Acceleration due to gravity";
         
+        /*  'wDims' is 2-element vector of size of hydroCoeff frequency vector [1, size].
+            Convert to scalar 'parameter Integer wSize' to pass as argument to readRealMatrix().
+            The first matrix dimension is size=1 since w, F_excRe, and F_excIm are vectors.
+            Size of w (frequency vector) is passed as argument for F_excRe and F_excIm also.
+        */
+        parameter String fileName "Address of hydroCoeff.mat file";
+        parameter Integer wDims[:] = Modelica.Utilities.Streams.readMatrixSize(fileName, "hydroCoeff.w");
+        parameter Integer wSize = wDims[2];
+        
+        parameter Real F_excRe[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcRe", 1, wSize));
+        parameter Real F_excIm[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcIm", 1, wSize));
+        parameter Real w[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.w", 1, wSize));
+        
         /*  Variable declarations */
-        parameter String fileName;
-        
-        Real F_excRe[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcRe", 1, 260));
-        Real F_excIm[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcIm", 1, 260));
-        Real w[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.w", 1, 260));
-        
         parameter Modelica.Units.SI.Length d = 100 "Water depth";
         parameter Modelica.Units.SI.Density rho = 1025 "Density of seawater";
         parameter Modelica.Units.SI.Length Hs = 2.5 "Significant Wave Height";
@@ -240,8 +263,8 @@ package OceanEngineeringToolbox
           end if;
 
           /* Interpolate excitation coefficients (Re & Im) for each frequency component */
-          ExcCoeffRe[i] = Modelica.Math.Vectors.interpolate(w2, F_excRe, omega[i]);
-          ExcCoeffIm[i] = Modelica.Math.Vectors.interpolate(w2, F_excIm, omega[i]);
+          ExcCoeffRe[i] = Modelica.Math.Vectors.interpolate(w, F_excRe, omega[i]);
+          ExcCoeffIm[i] = Modelica.Math.Vectors.interpolate(w, F_excIm, omega[i]);
         end for;
         
         /* Define wave elevation profile (SSE) and excitation force */
@@ -255,7 +278,10 @@ package OceanEngineeringToolbox
       end BrettschneiderWave;
 
       model JonswapWave
-        /*  JONSWAP Spectrum - Wave elevation profile and excitation force */
+        /*  Implements JONSWAP energy spectrum.
+            Excitation force transferred through 'wconn'.
+            Elevation profile is local and not transferred.
+        */
         
         extends Modelica.Blocks.Icons.Block;
         import Modelica.Math.Vectors;
@@ -265,14 +291,20 @@ package OceanEngineeringToolbox
         constant Real pi = Modelica.Constants.pi "Mathematical constant pi";
         constant Real g = Modelica.Constants.g_n "Acceleration due to gravity";
         
-        /*  Variable declarations */
-        parameter String fileName;
+        /*  'wDims' is 2-element vector of size of hydroCoeff frequency vector [1, size].
+            Convert to scalar 'parameter Integer wSize' to pass as argument to readRealMatrix().
+            The first matrix dimension is size=1 since w, F_excRe, and F_excIm are vectors.
+            Size of w (frequency vector) is passed as argument for F_excRe and F_excIm also.
+        */
+        parameter String fileName "Address of hydroCoeff.mat file";
+        parameter Integer wDims[:] = Modelica.Utilities.Streams.readMatrixSize(fileName, "hydroCoeff.w");
+        parameter Integer wSize = wDims[2];
         
-        Real F_excRe[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcRe", 1, 260));
-        Real F_excIm[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcIm", 1, 260));
-        Real w[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.w", 1, 260));
+        parameter Real F_excRe[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcRe", 1, wSize));
+        parameter Real F_excIm[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcIm", 1, wSize));
+        parameter Real w[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.w", 1, wSize));
         
-        /* Parameters */
+        /* Variable declarations */
         parameter Modelica.Units.SI.Length d = 100 "Water depth";
         parameter Modelica.Units.SI.Density rho = 1025 "Density of seawater";
         parameter Modelica.Units.SI.Length Hs = 2.5 "Significant Wave Height";
@@ -330,9 +362,16 @@ package OceanEngineeringToolbox
   end WaveProfile;
 
   package Structures
+    /*  'WEC' component models a rigid body in waves.
+        Implements a symbolic formulation of the Cummins equation.
+        Radiation force calculated using the state-space model.
+    */
 
     model WEC
-      /* Solve Cummins' equation using state-space model of the radiation convolution integral */
+      /*  Solves 1DOF Cummins' equation for single body.
+          Heave excitation force transferred in using 'wconn'.
+          Heave velocity and radiation force transferred out using 'conn'.
+      */
       
       extends Modelica.Blocks.Icons.Block;
       OceanEngineeringToolbox.Internal.Connectors.WaveInConn wconn "Connector for wave elevation and excitation force" annotation(
@@ -357,13 +396,13 @@ package OceanEngineeringToolbox
       Modelica.Units.SI.Force F_rad "Radiation Force";
       
     initial equation
-      /* Define body at rest initially */
+      /* Define body at rest at time=0 */
       z = 0;
       v_z = 0;
       
     equation
-      v_z = der(z) "Heave velocity";
-      a_z = der(v_z) "Heave acceleration";
+      v_z = der(z);
+      a_z = der(v_z);
       
       /* Radiation force state-space model */
       der(x) = (A1*x) + (B1*v_z);
@@ -380,6 +419,7 @@ package OceanEngineeringToolbox
   end Structures;
 
   package Internal
+    /*  Internal library of core functions and connectors */
   
     package Functions
       /* Package defining explicit library functions */
@@ -507,7 +547,7 @@ package OceanEngineeringToolbox
     end Functions;
   
     package Connectors
-      /* Package defining library connectors between models */
+      /* Package defining library connectors */
   
       connector WaveOutConn
         /* Output datastream - wave elevation & excitation force */
@@ -534,7 +574,7 @@ package OceanEngineeringToolbox
     model sample1
       /* Single body, regular waves */
       
-      parameter String filePath = "C:/.../hydroCoeff.mat";
+      parameter String filePath = "D:/Ocean Toolbox/Sanitized version/hydroCoeff.mat";
       OceanEngineeringToolbox.WaveProfile.RegularWave.LinearWave Reg1(fileName = filePath, Hs = 2.5, Trmp = 50);
       OceanEngineeringToolbox.Structures.WEC WEC1(fileName = filePath);
     equation
@@ -547,7 +587,7 @@ package OceanEngineeringToolbox
     model sample2
       /* Single body, irregular waves with PM spectrum */
       
-      parameter String filePath = "C:/.../hydroCoeff.mat";
+      parameter String filePath = "D:/Ocean Toolbox/Sanitized version/hydroCoeff.mat";
       OceanEngineeringToolbox.WaveProfile.IrregularWave.PiersonMoskowitzWave PM1(fileName = filePath, Hs = 2.5, n_omega = 100, Trmp = 50);
       OceanEngineeringToolbox.Structures.WEC WEC1(fileName = filePath);
     equation
@@ -562,7 +602,9 @@ package OceanEngineeringToolbox
   package Simulations
     /* Directory for user-defined simulation models */
   end Simulations;
+
 end OceanEngineeringToolbox;
+
 /*  Modelica Ocean Engineering Toolbox (OET)
     Developed at:
           Sys-MoDEL, 
