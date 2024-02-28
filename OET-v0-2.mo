@@ -1,4 +1,3 @@
-package OceanEngineeringToolbox
   /*  Modelica Ocean Engineering Toolbox v0.2
       Copyright (C) 2024  Ajay Menon, Ali Haider, Kush Bubbar
 
@@ -16,41 +15,38 @@ package OceanEngineeringToolbox
       here <https://www.gnu.org/licenses/>.
   */
   
-  /*  Library structure:
-       Ocean Engineering Toolbox (LIBRARY)
-       |  
-       |->  Wave Profile (PACKAGE)
-       |    |-> Regular Wave (PACKAGE)
-       |    |   |-> Regular Airy Wave (MODEL)               [!- Monochromatic regular wave]
-       |    |
-       |    |-> Irregular Wave (PACKAGE)
-       |    |   |-> Pierson Moskowitz Spectrum (MODEL)      [!- Fully-developed sea state]
-       |    |   |-> Brettschneider Spectrum (MODEL)         [!- Modified PM spectrum for developing sea state]
-       |    |   |-> JONSWAP Spectrum (MODEL)                [!- Developing sea state with limited fetch]
-       |    |
-       |->  Structures (MODEL)
-       |    |-> Plant Body (MODEL)                          [!- Solves motion through the Cummins equation]
-       |
-       |-> Comparison (PACKAGE)
-       |    |-> Reference Dataset (MODEL)                   [!- Imported from a Matlab struct]
-       |    |-> Frequency-Independent (MODEL)               [!- For comparison with the frequency-independent solution]
-       |
-       |->  Functions (PACKAGE)
-       |    |-> waveNumber (FUNCTION)                       [!- Wave number iterations from frequency and depth]
-       |    |-> randomNumberGen (FUNCTION)                  [!- Random numbers through XOR shift generator]
-       |    |-> frequencySelector (FUNCTION)                [!- Select wave frequencies from a range]
-       |    |-> spectrumGenerator_PM (FUNCTION)             [!- Generate Pierson Moskowitz spectrum for frequency components]
-       |    |-> spectrumGenerator_BRT (FUNCTION)            [!- Generate Brettschneider spectrum for frequency components]
-       |    |-> spectrumGenerator_JONSWAP (FUNCTION)        [!- Generate JONSWAP spectrum for frequency components]
-       |
-       |->  Connectors (PACKAGE)
-            |-> WaveOutConn (CONNECTOR)                     [!- Output transfer wave elevation and excitation force]
-            |-> WaveInConn (CONNECTOR)                      [!- Input transfer wave elevation and excitation force]
-            |-> DataCollector (CONNECTOR)                   [!- Transfer WEC dynamics - velocity and radiation force]
-  */
+/*  Library structure:
+     Ocean Engineering Toolbox (LIBRARY)
+     |  
+     |->  Wave Profile (PACKAGE)
+     |    |-> Regular Wave (PACKAGE)
+     |    |   |-> LinearModel (MODEL)               [!- Monochromatic regular wave]
+     |    |
+     |    |-> Irregular Wave (PACKAGE)
+     |    |   |-> Pierson Moskowitz Spectrum (MODEL)      [!- Fully-developed sea state]
+     |    |   |-> Brettschneider Spectrum (MODEL)         [!- Modified PM spectrum for developing sea state]
+     |    |   |-> JONSWAP Spectrum (MODEL)                [!- Developing sea state with limited fetch]
+     |    |
+     |->  Structures (PACKAGE)
+     |    |-> WEC (MODEL)                       [!- Solves motion through the Cummins equation]
+     |
+     |->  Functions (PACKAGE)
+     |    |-> waveNumber (FUNCTION)                       [!- Wave number iterations from frequency and depth]
+     |    |-> randomNumberGen (FUNCTION)                  [!- Random numbers through XOR shift generator]
+     |    |-> frequencySelector (FUNCTION)                [!- Select wave frequencies from a range]
+     |    |-> spectrumGenerator_PM (FUNCTION)             [!- Generate Pierson Moskowitz spectrum for frequency components]
+     |    |-> spectrumGenerator_BRT (FUNCTION)            [!- Generate Brettschneider spectrum for frequency components]
+     |    |-> spectrumGenerator_JONSWAP (FUNCTION)        [!- Generate JONSWAP spectrum for frequency components]
+     |
+     |->  Connectors (PACKAGE)
+          |-> WaveOutConn (CONNECTOR)                     [!- Output transfer wave elevation and excitation force]
+          |-> WaveInConn (CONNECTOR)                      [!- Input transfer wave elevation and excitation force]
+          |-> DataCollector (CONNECTOR)                   [!- Transfer WEC dynamics - velocity and radiation force]
+*/
 
-  /* Source Code */
+/* Source Code */
 
+package OceanEngineeringToolbox
   extends Modelica.Icons.Package;   /*  Library visibility */
 
   package WaveProfile
@@ -63,7 +59,7 @@ package OceanEngineeringToolbox
         
         extends Modelica.Blocks.Icons.Block;
         import Modelica.Math.Vectors;
-        OceanEngineeringToolbox.Connectors.WaveOutConn wconn;
+        OceanEngineeringToolbox.Internal.Connectors.WaveOutConn wconn;
         
         /* Environmental constants */
         constant Real pi = Modelica.Constants.pi "Mathematical constant pi";
@@ -72,9 +68,9 @@ package OceanEngineeringToolbox
         /*  Variable declarations */
         parameter String fileName;
         
-        Real F_excRe[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcRe", 1, 260));
-        Real F_excIm[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcIm", 1, 260));
-        Real w[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.w", 1, 260));
+        parameter Real F_excRe[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcRe", 1, 260));
+        parameter Real F_excIm[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcIm", 1, 260));
+        parameter Real w[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.w", 1, 260));
         
         parameter Modelica.Units.SI.Length d = 100 "Water depth";
         parameter Modelica.Units.SI.Density rho = 1025 "Density of seawater";
@@ -122,7 +118,7 @@ package OceanEngineeringToolbox
         
         extends Modelica.Blocks.Icons.Block;
         import Modelica.Math.Vectors;
-        OceanEngineeringToolbox.Connectors.WaveOutConn wconn;
+        OceanEngineeringToolbox.Internal.Connectors.WaveOutConn wconn;
         
         /* Modelica.Blocks.Interfaces.RealOutput F_exc "Wave time series" annotation(
                   Placement(transformation(extent = {{100, -10}, {120, 10}}))); */
@@ -136,9 +132,9 @@ package OceanEngineeringToolbox
         
         // Integer varSize[:] = Modelica.Utilities.Streams.readMatrixSize(fileName, "hydroCoeff.FexcRe");
         
-        Real F_excRe[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcRe", 1, 260));
-        Real F_excIm[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcIm", 1, 260));
-        Real w[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.w", 1, 260));
+        parameter Real F_excRe[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcRe", 1, 260));
+        parameter Real F_excIm[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.FexcIm", 1, 260));
+        parameter Real w[:] = vector(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.w", 1, 260));
         
         parameter Modelica.Units.SI.Length d = 100 "Water depth";
         parameter Modelica.Units.SI.Density rho = 1025 "Density of seawater";
@@ -151,16 +147,16 @@ package OceanEngineeringToolbox
         parameter Integer n_omega = 100 "Number of frequency components";
         parameter Integer localSeed = 614657 "Local random seed";
         parameter Integer globalSeed = 30020 "Global random seed";
-        parameter Real rnd_shft[n_omega] = OceanEngineeringToolbox.Functions.randomNumberGen(localSeed, globalSeed, n_omega);
+        parameter Real rnd_shft[n_omega] = OceanEngineeringToolbox.Internal.Functions.randomNumberGen(localSeed, globalSeed, n_omega);
         parameter Integer localSeed1 = 614757 "Local rand seed";
         parameter Integer globalSeed1 = 40020 "Global rand seed";
-        parameter Real epsilon[n_omega] = OceanEngineeringToolbox.Functions.randomNumberGen(localSeed1, globalSeed1, n_omega) "Wave components phase shift";
+        parameter Real epsilon[n_omega] = OceanEngineeringToolbox.Internal.Functions.randomNumberGen(localSeed1, globalSeed1, n_omega) "Wave components phase shift";
         parameter Real Trmp = 100 "Interval for ramping up of waves during start phase";
-        parameter Real omega[n_omega] = OceanEngineeringToolbox.Functions.frequencySelector(omega_min, omega_max, rnd_shft);
-        parameter Real S[n_omega] = OceanEngineeringToolbox.Functions.spectrumGenerator_PM(Hs, omega) "Spectral values for frequency components";
+        parameter Real omega[n_omega] = OceanEngineeringToolbox.Internal.Functions.frequencySelector(omega_min, omega_max, rnd_shft);
+        parameter Real S[n_omega] = OceanEngineeringToolbox.Internal.Functions.spectrumGenerator_PM(Hs, omega) "Spectral values for frequency components";
         parameter Modelica.Units.SI.Length zeta[n_omega] = sqrt(2*S*omega_min) "Wave amplitude component";
         parameter Real Tp[n_omega] = 2*pi./omega "Wave period components";
-        parameter Real k[n_omega] = OceanEngineeringToolbox.Functions.waveNumber(d, omega) "Wave number component";
+        parameter Real k[n_omega] = OceanEngineeringToolbox.Internal.Functions.waveNumber(d, omega) "Wave number component";
         Real ExcCoeffRe[n_omega] "Real component of excitation coefficient for frequency components";
         Real ExcCoeffIm[n_omega] "Imaginary component of excitation coefficient for frequency components";
         Real zeta_rmp[n_omega] "Ramp value for surface elevation";
@@ -196,7 +192,7 @@ package OceanEngineeringToolbox
         
         extends Modelica.Blocks.Icons.Block;
         import Modelica.Math.Vectors;
-        OceanEngineeringToolbox.Connectors.WaveOutConn wconn;
+        OceanEngineeringToolbox.Internal.Connectors.WaveOutConn wconn;
         
         /* Environmental constants */
         constant Real pi = Modelica.Constants.pi "Mathematical constant pi";
@@ -218,16 +214,16 @@ package OceanEngineeringToolbox
         parameter Integer n_omega = 100 "Number of frequency components";
         parameter Integer localSeed = 614657 "Local random seed";
         parameter Integer globalSeed = 30020 "Global random seed";
-        parameter Real rnd_shft[n_omega] = OceanEngineeringToolbox.Functions.randomNumberGen(localSeed, globalSeed, n_omega);
+        parameter Real rnd_shft[n_omega] = OceanEngineeringToolbox.Internal.Functions.randomNumberGen(localSeed, globalSeed, n_omega);
         parameter Integer localSeed1 = 614757 "Local rand seed";
         parameter Integer globalSeed1 = 40020 "Global rand seed";
-        parameter Real epsilon[n_omega] = OceanEngineeringToolbox.Functions.randomNumberGen(localSeed1, globalSeed1, n_omega) "Wave components phase shift";
+        parameter Real epsilon[n_omega] = OceanEngineeringToolbox.Internal.Functions.randomNumberGen(localSeed1, globalSeed1, n_omega) "Wave components phase shift";
         parameter Real Trmp = 200 "Interval for ramping up of waves during start phase";
-        parameter Real omega[n_omega] = OceanEngineeringToolbox.Functions.frequencySelector(omega_min, omega_max, rnd_shft);
-        parameter Real S[n_omega] = OceanEngineeringToolbox.Functions.spectrumGenerator_BRT(Hs, omega, omega_peak) "Spectral values for frequency components";
+        parameter Real omega[n_omega] = OceanEngineeringToolbox.Internal.Functions.frequencySelector(omega_min, omega_max, rnd_shft);
+        parameter Real S[n_omega] = OceanEngineeringToolbox.Internal.Functions.spectrumGenerator_BRT(Hs, omega, omega_peak) "Spectral values for frequency components";
         parameter Modelica.Units.SI.Length zeta[n_omega] = sqrt(2*S*omega_min) "Wave amplitude component";
         parameter Real Tp[n_omega] = 2*pi./omega "Wave period components";
-        parameter Real k[n_omega] = OceanEngineeringToolbox.Functions.waveNumber(d, omega) "Wave number component";
+        parameter Real k[n_omega] = OceanEngineeringToolbox.Internal.Functions.waveNumber(d, omega) "Wave number component";
         Real ExcCoeffRe[n_omega] "Real component of excitation coefficient for frequency components";
         Real ExcCoeffIm[n_omega] "Imaginary component of excitation coefficient for frequency components";
         Real zeta_rmp[n_omega] "Ramp value for surface elevation";
@@ -263,7 +259,7 @@ package OceanEngineeringToolbox
         
         extends Modelica.Blocks.Icons.Block;
         import Modelica.Math.Vectors;
-        OceanEngineeringToolbox.Connectors.WaveOutConn wconn;
+        OceanEngineeringToolbox.Internal.Connectors.WaveOutConn wconn;
         
         /* Environmental constants */
         constant Real pi = Modelica.Constants.pi "Mathematical constant pi";
@@ -288,16 +284,16 @@ package OceanEngineeringToolbox
         parameter Integer n_omega = 100 "Number of frequency components";
         parameter Integer localSeed = 614657 "Local random seed";
         parameter Integer globalSeed = 30020 "Global random seed";
-        parameter Real rnd_shft[n_omega] = OceanEngineeringToolbox.Functions.randomNumberGen(localSeed, globalSeed, n_omega);
+        parameter Real rnd_shft[n_omega] = OceanEngineeringToolbox.Internal.Functions.randomNumberGen(localSeed, globalSeed, n_omega);
         parameter Integer localSeed1 = 614757 "Local rand seed";
         parameter Integer globalSeed1 = 40020 "Global rand seed";
-        parameter Real epsilon[n_omega] = OceanEngineeringToolbox.Functions.randomNumberGen(localSeed1, globalSeed1, n_omega) "Wave components phase shift";
+        parameter Real epsilon[n_omega] = OceanEngineeringToolbox.Internal.Functions.randomNumberGen(localSeed1, globalSeed1, n_omega) "Wave components phase shift";
         parameter Real Trmp = 200 "Interval for ramping up of waves during start phase";
-        parameter Real omega[n_omega] = OceanEngineeringToolbox.Functions.frequencySelector(omega_min, omega_max, rnd_shft);
-        parameter Real S[n_omega] = OceanEngineeringToolbox.Functions.spectrumGenerator_JONSWAP(Hs, omega, omega_peak, spectralWidth_min, spectralWidth_max) "Spectral values for frequency components";
+        parameter Real omega[n_omega] = OceanEngineeringToolbox.Internal.Functions.frequencySelector(omega_min, omega_max, rnd_shft);
+        parameter Real S[n_omega] = OceanEngineeringToolbox.Internal.Functions.spectrumGenerator_JONSWAP(Hs, omega, omega_peak, spectralWidth_min, spectralWidth_max) "Spectral values for frequency components";
         parameter Modelica.Units.SI.Length zeta[n_omega] = sqrt(2*S*omega_min) "Wave amplitude component";
         parameter Real Tp[n_omega] = 2*pi./omega "Wave period components";
-        parameter Real k[n_omega] = OceanEngineeringToolbox.Functions.waveNumber(d, omega) "Wave number component";
+        parameter Real k[n_omega] = OceanEngineeringToolbox.Internal.Functions.waveNumber(d, omega) "Wave number component";
         Real ExcCoeffRe[n_omega] "Real component of excitation coefficient for frequency components";
         Real ExcCoeffIm[n_omega] "Imaginary component of excitation coefficient for frequency components";
         Real zeta_rmp[n_omega] "Ramp value for surface elevation";
@@ -333,196 +329,204 @@ package OceanEngineeringToolbox
   
   end WaveProfile;
 
-  model WEC
-    /* Solve Cummins' equation using state-space model of the radiation convolution integral */
-    
-    extends Modelica.Blocks.Icons.Block;
-    OceanEngineeringToolbox.Connectors.WaveInConn wconn "Connector for wave elevation and excitation force" annotation(
-      Placement(transformation(extent = {{-90, -10}, {-110, 10}})));
-    OceanEngineeringToolbox.Connectors.DataCollector conn "Connector for velocity and radiation force" annotation(
-      Placement(transformation(extent = {{-10, 90}, {10, 110}})));
-    
-    /* Parameters & variables */
-    parameter String fileName;
-    parameter Modelica.Units.SI.Mass M = scalar(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.m33", 1, 1)) "Total mass of the body (including ballast)";
-    parameter Modelica.Units.SI.Mass Ainf = scalar(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.Ainf33", 1, 1)) "Added mass at maximum (cut-off) frequency";
-    parameter Modelica.Units.SI.TranslationalSpringConstant Khs = scalar(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.Khs33", 1, 1)) "Hydrostatic stiffness";
-    
-    Real A1[2, 2] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.ss_rad33.A", 2, 2) "State matrix";
-    Real B1[2, 1] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.ss_rad33.B", 2, 1) "Input matrix";
-    Real C1[1, 2] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.ss_rad33.C", 1, 2) "Output matrix";
-    Real D1 = scalar(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.ss_rad33.D", 1, 1)) "Feedthrough matrix";
-    Real x[2,1] "State-space intermediate variables";
-    Modelica.Units.SI.Length z "Heave displacement";
-    Modelica.Units.SI.Velocity v_z "Heave velocity";
-    Modelica.Units.SI.Acceleration a_z "Heave acceleration";
-    Modelica.Units.SI.Force F_rad "Radiation Force";
-    
-  initial equation
-    /* Define body at rest initially */
-    z = 0;
-    v_z = 0;
-    
-  equation
-    v_z = der(z) "Heave velocity";
-    a_z = der(v_z) "Heave acceleration";
-    
-    /* Radiation force state-space model */
-    der(x) = (A1*x) + (B1*v_z);
-    F_rad = scalar(C1*x) + (D1*v_z);
+  package Structures
 
-    /* Assemble Cummins' equation */
-    ((M + Ainf)*a_z) + F_rad + (Khs*z) = wconn.F_exc;
+    model WEC
+      /* Solve Cummins' equation using state-space model of the radiation convolution integral */
+      
+      extends Modelica.Blocks.Icons.Block;
+      OceanEngineeringToolbox.Internal.Connectors.WaveInConn wconn "Connector for wave elevation and excitation force" annotation(
+        Placement(transformation(extent = {{-90, -10}, {-110, 10}})));
+      OceanEngineeringToolbox.Internal.Connectors.DataCollector conn "Connector for velocity and radiation force" annotation(
+        Placement(transformation(extent = {{-10, 90}, {10, 110}})));
+      
+      /* Parameters & variables */
+      parameter String fileName;
+      parameter Modelica.Units.SI.Mass M = scalar(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.m33", 1, 1)) "Total mass of the body (including ballast)";
+      parameter Modelica.Units.SI.Mass Ainf = scalar(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.Ainf33", 1, 1)) "Added mass at maximum (cut-off) frequency";
+      parameter Modelica.Units.SI.TranslationalSpringConstant Khs = scalar(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.Khs33", 1, 1)) "Hydrostatic stiffness";
+      
+      parameter Real A1[2, 2] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.ss_rad33.A", 2, 2) "State matrix";
+      parameter Real B1[2, 1] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.ss_rad33.B", 2, 1) "Input matrix";
+      parameter Real C1[1, 2] = Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.ss_rad33.C", 1, 2) "Output matrix";
+      parameter Real D1 = scalar(Modelica.Utilities.Streams.readRealMatrix(fileName, "hydroCoeff.ss_rad33.D", 1, 1)) "Feed matrix";
+      Real x[2,1] "State-space intermediate variables";
+      Modelica.Units.SI.Length z "Heave displacement";
+      Modelica.Units.SI.Velocity v_z "Heave velocity";
+      Modelica.Units.SI.Acceleration a_z "Heave acceleration";
+      Modelica.Units.SI.Force F_rad "Radiation Force";
+      
+    initial equation
+      /* Define body at rest initially */
+      z = 0;
+      v_z = 0;
+      
+    equation
+      v_z = der(z) "Heave velocity";
+      a_z = der(v_z) "Heave acceleration";
+      
+      /* Radiation force state-space model */
+      der(x) = (A1*x) + (B1*v_z);
+      F_rad = scalar(C1*x) + (D1*v_z);
+  
+      /* Assemble Cummins' equation */
+      ((M + Ainf)*a_z) + F_rad + (Khs*z) = wconn.F_exc;
+  
+      /* Connector declarations */
+      conn.F_rad = F_rad;
+      conn.v_z = v_z;
+    end WEC;
 
-    /* Connector declarations */
-    conn.F_rad = F_rad;
-    conn.v_z = v_z;
-  end WEC;
+  end Structures;
 
-  package Functions
-    /* Package defining explicit library functions */
+  package Internal
+  
+    package Functions
+      /* Package defining explicit library functions */
+  
+      function waveNumber
+        /* Function to iteratively compute the wave number from the frequency components */
+        input Real d "Water depth";
+        input Real omega[:] "Wave frequency components";
+        output Real k[size(omega, 1)] "Wave number components";
+      protected
+        constant Real g = Modelica.Constants.g_n;
+        constant Real pi = Modelica.Constants.pi;
+        parameter Integer n = size(omega, 1);
+        Real T[size(omega, 1)] "Wave period components";
+        Real L0[size(omega, 1)] "Deepwater wave length";
+        Real L1(start = 0, fixed = true) "Temporary variable";
+        Real L1c(start = 0, fixed = true) "Temporary variable";
+        Real L[size(omega, 1)] "Iterated wave length";
+      algorithm
+        T := 2*pi./omega;
+        L0 := g*T.^2/(2*pi);
+        for i in 1:size(omega, 1) loop
+          L1 := L0[i];
+          L1c := 0;
+          while abs(L1c - L1) > 0.001 loop
+            L1c := L1;
+            L[i] := g*T[i]^2/(2*pi)*tanh(2*pi/L1*d);
+            L1 := L[i];
+          end while;
+        end for;
+        k := 2*pi./L;
+      end waveNumber;
+  
+      function randomNumberGen
+        /* Function to generate random numbers from local and global seeds using XOR shift */
+        input Integer ls = 614657 "Local seed";
+        input Integer gs = 30020 "Global seed";
+        input Integer n = 100 "Number of frequency components";
+        output Real r64[n] "Random number vector";
+      protected
+        Integer state64[2](each start = 0, each fixed = true);
+      algorithm
+        state64[1] := 0;
+        state64[2] := 0;
+        for i in 1:n loop
+          if i == 1 then
+            state64 := Modelica.Math.Random.Generators.Xorshift64star.initialState(ls, gs);
+            r64[i] := 0;
+          else
+            (r64[i], state64) := Modelica.Math.Random.Generators.Xorshift64star.random((state64));
+          end if;
+        end for;
+      end randomNumberGen;
+  
+      function frequencySelector
+        /* Function to randomly select frequency components */
+        input Real omega_min "Frequency minima";
+        input Real omega_max "Frequency maxima";
+        input Real epsilon[:] "Random phase vector";
+        output Real omega[size(epsilon, 1)] "Output vector of frequency components";
+      protected
+        parameter Real ref_omega[size(epsilon, 1)] = omega_min:(omega_max - omega_min)/(size(epsilon, 1) - 1):omega_max;
+      algorithm
+        omega[1] := omega_min;
+        for i in 2:size(epsilon, 1) - 1 loop
+          omega[i] := ref_omega[i] + epsilon[i]*omega_min;
+        end for;
+        omega[size(epsilon, 1)] := omega_max;
+      end frequencySelector;
+  
+      function spectrumGenerator_PM
+        /* Function to generate Pierson Moskowitz spectrum */
+        input Real Hs = 1 "Significant wave height";
+        input Real omega[:] "Frequency components";
+        output Real spec[size(omega, 1)] "Spectral values for input frequencies";
+      protected
+        constant Real pi = Modelica.Constants.pi;
+        constant Real g = Modelica.Constants.g_n;
+      algorithm
+        for i in 1:size(omega, 1) loop
+          spec[i] := 0.0081*g^2/omega[i]^5*exp(-0.0358*(g/(Hs*omega[i]^2))^2);
+        end for;
+      end spectrumGenerator_PM;
+  
+      function spectrumGenerator_BRT
+        /* Function to generate Brettschneider spectrum */
+        input Real Hs = 1 "Significant wave height";
+        input Real omega[:] "Frequency components";
+        input Real omega_peak = 0.9423 "Peak spectral frequency";
+        output Real spec[size(omega, 1)] "Spectral values for input frequencies";
+      protected
+        constant Real pi = Modelica.Constants.pi;
+        constant Real g = Modelica.Constants.g_n;
+      algorithm
+        for i in 1:size(omega, 1) loop
+          spec[i] := 1.9635*Hs^2*omega_peak^4/omega[i]^5*exp(-1.25*((omega_peak/omega[i])^4));
+        end for;
+      end spectrumGenerator_BRT;
+  
+      function spectrumGenerator_JONSWAP
+        /* Function to generate JONSWAP spectrum */
+        input Real Hs = 1 "Significant wave height";
+        input Real omega[:] "Frequency components";
+        input Real omega_peak = 0.9423 "Peak spectral frequency";
+        input Real spectralWidth_min "Spectral width lower bound";
+        input Real spectralWidth_max "Spectral width upper bound";
+        output Real spec[size(omega, 1)] "Spectral values for input frequencies";
+      protected
+        constant Real pi = Modelica.Constants.pi;
+        constant Real g = Modelica.Constants.g_n;
+        constant Real gamma = 3.3;
+        Real sigma;
+        Real b;
+      algorithm
+        for i in 1:size(omega, 1) loop
+          if omega[i] > omega_peak then
+            sigma := spectralWidth_max;
+          else
+            sigma := spectralWidth_min;
+          end if;
+          b := exp(-0.5*(((omega[i] - omega_peak)/(sigma*omega_peak))^2));
+          spec[i] := 0.0081*g^2/omega[i]^5*exp(-1.25*((omega_peak/omega[i])^4))*gamma^b;
+        end for;
+      end spectrumGenerator_JONSWAP;
+    end Functions;
+  
+    package Connectors
+      /* Package defining library connectors between models */
+  
+      connector WaveOutConn
+        /* Output datastream - wave elevation & excitation force */
+        Modelica.Blocks.Interfaces.RealOutput F_exc;
+      end WaveOutConn;
+  
+      connector WaveInConn
+        /* Input datastream - wave elevation & excitation force */
+        Modelica.Blocks.Interfaces.RealInput F_exc;
+      end WaveInConn;
+  
+      connector DataCollector
+        /* Output datastream - velocity and radiation force */
+        Modelica.Blocks.Interfaces.RealOutput F_rad;
+        Modelica.Blocks.Interfaces.RealOutput v_z;
+      end DataCollector;
+    end Connectors;
 
-    function waveNumber
-      /* Function to iteratively compute the wave number from the frequency components */
-      input Real d "Water depth";
-      input Real omega[:] "Wave frequency components";
-      output Real k[size(omega, 1)] "Wave number components";
-    protected
-      constant Real g = Modelica.Constants.g_n;
-      constant Real pi = Modelica.Constants.pi;
-      parameter Integer n = size(omega, 1);
-      Real T[size(omega, 1)] "Wave period components";
-      Real L0[size(omega, 1)] "Deepwater wave length";
-      Real L1(start = 0, fixed = true) "Temporary variable";
-      Real L1c(start = 0, fixed = true) "Temporary variable";
-      Real L[size(omega, 1)] "Iterated wave length";
-    algorithm
-      T := 2*pi./omega;
-      L0 := g*T.^2/(2*pi);
-      for i in 1:size(omega, 1) loop
-        L1 := L0[i];
-        L1c := 0;
-        while abs(L1c - L1) > 0.001 loop
-          L1c := L1;
-          L[i] := g*T[i]^2/(2*pi)*tanh(2*pi/L1*d);
-          L1 := L[i];
-        end while;
-      end for;
-      k := 2*pi./L;
-    end waveNumber;
-
-    function randomNumberGen
-      /* Function to generate random numbers from local and global seeds using XOR shift */
-      input Integer ls = 614657 "Local seed";
-      input Integer gs = 30020 "Global seed";
-      input Integer n = 100 "Number of frequency components";
-      output Real r64[n] "Random number vector";
-    protected
-      Integer state64[2](each start = 0, each fixed = true);
-    algorithm
-      state64[1] := 0;
-      state64[2] := 0;
-      for i in 1:n loop
-        if i == 1 then
-          state64 := Modelica.Math.Random.Generators.Xorshift64star.initialState(ls, gs);
-          r64[i] := 0;
-        else
-          (r64[i], state64) := Modelica.Math.Random.Generators.Xorshift64star.random((state64));
-        end if;
-      end for;
-    end randomNumberGen;
-
-    function frequencySelector
-      /* Function to randomly select frequency components */
-      input Real omega_min "Frequency minima";
-      input Real omega_max "Frequency maxima";
-      input Real epsilon[:] "Random phase vector";
-      output Real omega[size(epsilon, 1)] "Output vector of frequency components";
-    protected
-      parameter Real ref_omega[size(epsilon, 1)] = omega_min:(omega_max - omega_min)/(size(epsilon, 1) - 1):omega_max;
-    algorithm
-      omega[1] := omega_min;
-      for i in 2:size(epsilon, 1) - 1 loop
-        omega[i] := ref_omega[i] + epsilon[i]*omega_min;
-      end for;
-      omega[size(epsilon, 1)] := omega_max;
-    end frequencySelector;
-
-    function spectrumGenerator_PM
-      /* Function to generate Pierson Moskowitz spectrum */
-      input Real Hs = 1 "Significant wave height";
-      input Real omega[:] "Frequency components";
-      output Real spec[size(omega, 1)] "Spectral values for input frequencies";
-    protected
-      constant Real pi = Modelica.Constants.pi;
-      constant Real g = Modelica.Constants.g_n;
-    algorithm
-      for i in 1:size(omega, 1) loop
-        spec[i] := 0.0081*g^2/omega[i]^5*exp(-0.0358*(g/(Hs*omega[i]^2))^2);
-      end for;
-    end spectrumGenerator_PM;
-
-    function spectrumGenerator_BRT
-      /* Function to generate Brettschneider spectrum */
-      input Real Hs = 1 "Significant wave height";
-      input Real omega[:] "Frequency components";
-      input Real omega_peak = 0.9423 "Peak spectral frequency";
-      output Real spec[size(omega, 1)] "Spectral values for input frequencies";
-    protected
-      constant Real pi = Modelica.Constants.pi;
-      constant Real g = Modelica.Constants.g_n;
-    algorithm
-      for i in 1:size(omega, 1) loop
-        spec[i] := 1.9635*Hs^2*omega_peak^4/omega[i]^5*exp(-1.25*((omega_peak/omega[i])^4));
-      end for;
-    end spectrumGenerator_BRT;
-
-    function spectrumGenerator_JONSWAP
-      /* Function to generate JONSWAP spectrum */
-      input Real Hs = 1 "Significant wave height";
-      input Real omega[:] "Frequency components";
-      input Real omega_peak = 0.9423 "Peak spectral frequency";
-      input Real spectralWidth_min "Spectral width lower bound";
-      input Real spectralWidth_max "Spectral width upper bound";
-      output Real spec[size(omega, 1)] "Spectral values for input frequencies";
-    protected
-      constant Real pi = Modelica.Constants.pi;
-      constant Real g = Modelica.Constants.g_n;
-      constant Real gamma = 3.3;
-      Real sigma;
-      Real b;
-    algorithm
-      for i in 1:size(omega, 1) loop
-        if omega[i] > omega_peak then
-          sigma := spectralWidth_max;
-        else
-          sigma := spectralWidth_min;
-        end if;
-        b := exp(-0.5*(((omega[i] - omega_peak)/(sigma*omega_peak))^2));
-        spec[i] := 0.0081*g^2/omega[i]^5*exp(-1.25*((omega_peak/omega[i])^4))*gamma^b;
-      end for;
-    end spectrumGenerator_JONSWAP;
-  end Functions;
-
-  package Connectors
-    /* Package defining library connectors between models */
-
-    connector WaveOutConn
-      /* Output datastream - wave elevation & excitation force */
-      Modelica.Blocks.Interfaces.RealOutput F_exc;
-    end WaveOutConn;
-
-    connector WaveInConn
-      /* Input datastream - wave elevation & excitation force */
-      Modelica.Blocks.Interfaces.RealInput F_exc;
-    end WaveInConn;
-
-    connector DataCollector
-      /* Output datastream - velocity and radiation force */
-      Modelica.Blocks.Interfaces.RealOutput F_rad;
-      Modelica.Blocks.Interfaces.RealOutput v_z;
-    end DataCollector;
-  end Connectors;
+  end Internal;
 
   package Tutorial
     /* Sample simulation models */
@@ -532,12 +536,12 @@ package OceanEngineeringToolbox
       
       parameter String filePath = "D:/Ocean Toolbox/Sanitized version/hydroCoeff.mat";
       OceanEngineeringToolbox.WaveProfile.RegularWave.LinearWave Reg1(fileName = filePath, Hs = 2.5, Trmp = 50);
-      OceanEngineeringToolbox.WEC WEC1(fileName = filePath);
+      OceanEngineeringToolbox.Structures.WEC WEC1(fileName = filePath);
     equation
       connect(Reg1.wconn.F_exc, WEC1.wconn.F_exc);
       annotation(
         Line(points = {{-40, 30}, {-20, 30}, {-20, 0}, {40, 0}, {40, 0}}),
-        experiment(StartTime = 0, StopTime = 200, Tolerance = 1e-06, Interval = 0.1));
+        experiment(StartTime = 0, StopTime = 500, Tolerance = 1e-06, Interval = 0.1));
     end sample1;
     
     model sample2
@@ -545,13 +549,14 @@ package OceanEngineeringToolbox
       
       parameter String filePath = "D:/Ocean Toolbox/Sanitized version/hydroCoeff.mat";
       OceanEngineeringToolbox.WaveProfile.IrregularWave.PiersonMoskowitzWave PM1(fileName = filePath, Hs = 2.5, n_omega = 100, Trmp = 50);
-      OceanEngineeringToolbox.WEC WEC1(fileName = filePath);
+      OceanEngineeringToolbox.Structures.WEC WEC1(fileName = filePath);
     equation
       connect(PM1.wconn.F_exc, WEC1.wconn.F_exc);
       annotation(
         Line(points = {{-40, 30}, {-20, 30}, {-20, 0}, {40, 0}, {40, 0}}),
         experiment(StartTime = 0, StopTime = 200, Tolerance = 1e-06, Interval = 0.1));
     end sample2;
+    
   end Tutorial;
 
   package Simulations
