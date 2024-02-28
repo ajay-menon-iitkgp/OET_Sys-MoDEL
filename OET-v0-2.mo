@@ -28,7 +28,7 @@
      |    |   |-> JONSWAP Spectrum (MODEL)                [!- Developing sea state with limited fetch]
      |    |
      |->  Structures (PACKAGE)
-     |    |-> WEC (MODEL)                                 [!- Solves motion through the Cummins equation]
+     |    |-> RigidBody (MODEL)                                 [!- Solves motion through the Cummins equation]
      |
      |->  Functions (PACKAGE)
      |    |-> waveNumber (FUNCTION)                       [!- Wave number iterations from frequency and depth]
@@ -41,7 +41,7 @@
      |->  Connectors (PACKAGE)
           |-> WaveOutConn (CONNECTOR)                     [!- Output transfer wave elevation and excitation force]
           |-> WaveInConn (CONNECTOR)                      [!- Input transfer wave elevation and excitation force]
-          |-> DataCollector (CONNECTOR)                   [!- Transfer WEC dynamics - velocity and radiation force]
+          |-> DataCollector (CONNECTOR)                   [!- Transfer 'Rigid Body' dynamics - velocity and radiation force]
 */
 
 package OceanEngineeringToolbox
@@ -362,12 +362,12 @@ package OceanEngineeringToolbox
   end WaveProfile;
 
   package Structures
-    /*  'WEC' component models a rigid body in waves.
+    /*  'RigidBody' component models a rigid body in waves.
         Implements a symbolic formulation of the Cummins equation.
         Radiation force calculated using the state-space model.
     */
 
-    model WEC
+    model RigidBody
       /*  Solves 1DOF Cummins' equation for single body.
           Heave excitation force transferred in using 'wconn'.
           Heave velocity and radiation force transferred out using 'conn'.
@@ -414,7 +414,7 @@ package OceanEngineeringToolbox
       /* Connector declarations */
       conn.F_rad = F_rad;
       conn.v_z = v_z;
-    end WEC;
+    end RigidBody;
 
   end Structures;
 
@@ -576,9 +576,9 @@ package OceanEngineeringToolbox
       
       parameter String filePath = "D:/Ocean Toolbox/Sanitized version/hydroCoeff.mat";
       OceanEngineeringToolbox.WaveProfile.RegularWave.LinearWave Reg1(fileName = filePath, Hs = 2.5, Trmp = 50);
-      OceanEngineeringToolbox.Structures.WEC WEC1(fileName = filePath);
+      OceanEngineeringToolbox.Structures.RigidBody Body1(fileName = filePath);
     equation
-      connect(Reg1.wconn.F_exc, WEC1.wconn.F_exc);
+      connect(Reg1.wconn.F_exc, Body1.wconn.F_exc);
       annotation(
         Line(points = {{-40, 30}, {-20, 30}, {-20, 0}, {40, 0}, {40, 0}}),
         experiment(StartTime = 0, StopTime = 500, Tolerance = 1e-06, Interval = 0.1));
@@ -589,9 +589,9 @@ package OceanEngineeringToolbox
       
       parameter String filePath = "D:/Ocean Toolbox/Sanitized version/hydroCoeff.mat";
       OceanEngineeringToolbox.WaveProfile.IrregularWave.PiersonMoskowitzWave PM1(fileName = filePath, Hs = 2.5, n_omega = 100, Trmp = 50);
-      OceanEngineeringToolbox.Structures.WEC WEC1(fileName = filePath);
+      OceanEngineeringToolbox.Structures.RigidBody Body1(fileName = filePath);
     equation
-      connect(PM1.wconn.F_exc, WEC1.wconn.F_exc);
+      connect(PM1.wconn.F_exc, Body1.wconn.F_exc);
       annotation(
         Line(points = {{-40, 30}, {-20, 30}, {-20, 0}, {40, 0}, {40, 0}}),
         experiment(StartTime = 0, StopTime = 200, Tolerance = 1e-06, Interval = 0.1));
