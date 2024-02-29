@@ -117,7 +117,7 @@ The OET does not currently support visualization capabilities. Hence, a geometry
         model sample1
             parameter String filePath = "F:/.../hydroCoeff.mat";          /* Edit this parameter to full path of hydroCoeff.mat */
             OceanEngineeringToolbox.WaveProfile.RegularWave.LinearModel Reg1(fileName = filePath, Hs = 5, Trmp = 50);    /* Edit component parameters if required */
-            OceanEngineeringToolbox.RigidBody Body1(fileName = filePath);        /* Body1 instance of RigidBody component initialized */
+            OceanEngineeringToolbox.Structures.RigidBody Body1(fileName = filePath);        /* Body1 instance of RigidBody component initialized */
 
             equation
                 connect(Reg1.wconn.F_exc, Body1.wconn.F_exc);              /* Components connected */
@@ -128,7 +128,7 @@ The OET does not currently support visualization capabilities. Hence, a geometry
         model sample2
             parameter String filePath = "F:/.../hydroCoeff.mat";
             OceanEngineeringToolbox.WaveProfile.IrregularWave.PiersonMoskowitzWave PM1(fileName = filePath, Hs = 2.5, n_omega = 100, Trmp = 100);    /* Additional 'n_omega' parameter for irregular waves */
-            OceanEngineeringToolbox.RigidBody Body2(fileName = filePath);
+            OceanEngineeringToolbox.Structures.RigidBody Body2(fileName = filePath);
 
             equation
                 connect(PM1.wconn.F_exc, Body2.wconn.F_exc);
@@ -163,16 +163,15 @@ Number of wave components | `n_omega` | $-$
 Wave frequency components | `omega` | $rad/s$
 Wave energy spectrum value | `S` | $m^2$
 Amplitude of wave components | `zeta` | $m$
-Ramped amplitude of wave components | `zeta_rmp` | $m$
 Wave number of wave components | `k` | $m^{-1}$
-Wave elevation profile, ramped | `SSE` | $m$
+Wave elevation profile | `SSE` | $m$
 Wave excitation coefficient - real component | `ExcCoeffRe` |
 Wave excitation coefficient - imaginary component | `ExcCoeffIm` |
 
 11. These output variables can be exported to a CSV file for post-processing or data analysis. For users who wish to compare results with WEC-Sim, the variables must be selected in a specific order and then exported, so that the CSV output preserves this order. The default Modelica export file name `exportedVariables.csv` is used in `Processor.m`. Selecting any variable automatically saves the `time` variable to the first column of the CSV file. Thus, the user must select the variables from `SSE` onwards. The order of these variables (and the order in the CSV file) is as follows:
 
     - Time (`t`) - Does not need to be selected
-    - Wave elevation profile, ramped (`SSE`)
+    - Wave elevation profile (`SSE`)
     - Wave excitation force (`F_exc`)
     - Wave radiation force (`F_rad`)
     - Heave displacement response (`z`)
@@ -192,6 +191,9 @@ Wave excitation coefficient - imaginary component | `ExcCoeffIm` |
     - Absolute difference - excitation force (4.1)
     - Absolute difference - radiation force (4.2)
     - Absolute difference - heave velocity (4.3)
+
+> [!TIP]
+> Developers and OET contributors can test code modifications by running the `Internal\TestDevelopment` model in the OET source rather than having to manually build and simulate multiple models. `TestDevelopment` builds sub-models with each excitation component and the rigid body. Errors and warnings can be identified and addressed by simulating this model.
 
 ## Tutorial
 
