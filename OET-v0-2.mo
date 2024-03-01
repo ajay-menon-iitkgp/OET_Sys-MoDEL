@@ -561,7 +561,7 @@ package OceanEngineeringToolbox
     model TestDevelopment
       /* Model to test all wave components and WEC rigid body */
       
-      parameter String filePath = "D:/Ocean Toolbox/Sanitized version/hydroCoeff.mat";
+      parameter String filePath = "D:/.../hydroCoeff.mat";
       OceanEngineeringToolbox.WaveProfile.RegularWave.LinearWave Reg1(fileName = filePath, Hs = 2.5, Trmp = 50);
       OceanEngineeringToolbox.WaveProfile.IrregularWave.PiersonMoskowitzWave Irr1(fileName = filePath, Hs = 2.5, n_omega = 100, Trmp = 50);
       OceanEngineeringToolbox.WaveProfile.IrregularWave.BretschneiderWave Irr2(fileName = filePath, Hs = 2.5, n_omega = 100, Trmp = 50);
@@ -589,7 +589,7 @@ package OceanEngineeringToolbox
     model sample1
       /* Single body, regular waves */
       
-      parameter String filePath = "D:/Ocean Toolbox/Sanitized version/hydroCoeff.mat";
+      parameter String filePath = "D:/.../hydroCoeff.mat";
       OceanEngineeringToolbox.WaveProfile.RegularWave.LinearWave Reg1(fileName = filePath, Hs = 2.5, Trmp = 50);
       OceanEngineeringToolbox.Structures.RigidBody Body1(fileName = filePath);
     equation
@@ -602,7 +602,7 @@ package OceanEngineeringToolbox
     model sample2
       /* Single body, irregular waves with PM spectrum */
       
-      parameter String filePath = "D:/Ocean Toolbox/Sanitized version/hydroCoeff.mat";
+      parameter String filePath = "D:/...hydroCoeff.mat";
       OceanEngineeringToolbox.WaveProfile.IrregularWave.PiersonMoskowitzWave PM1(fileName = filePath, Hs = 2.5, n_omega = 100, Trmp = 100);
       OceanEngineeringToolbox.Structures.RigidBody Body1(fileName = filePath);
     equation
