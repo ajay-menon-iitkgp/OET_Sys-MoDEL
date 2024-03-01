@@ -1,6 +1,8 @@
 # Ocean Engineering Toolbox (OET) Documentation
 
-The Ocean Engineering Toolbox (OET) is an open-source Modelica library to simulate a single-body, floating, rigid body in uni-directional waves (mono- and polychromatic). The library is under development and currently in pre-release version 0.2. A typical use case for the OET is the simulation of freely-floating wave energy conversion devices. This documentation covers the installation and usage of v0.2 when running the OpenModelica (OMEdit) solver engine.
+The Ocean Engineering Toolbox (OET) is an open-source Modelica library to simulate a single-body, floating, rigid body in uni-directional waves (mono- and polychromatic). The library is under development and currently in pre-release version 0.2. A typical use case for the OET is the simulation of freely-floating wave energy conversion devices.
+
+This documentation applies to the [latest release](https://github.com/ajay-menon-iitkgp/OET_Sys-MoDEL/releases/latest) only. Previous versions of the OET are not maintained and may be unstable on newer versions of Modelica/OpenModelica.
 
 > [!WARNING]
 > The state-space BEMIO import statements in `Processor.m` are under construction. Users must manually enter the SS matrices or use the tutorial `hydroCoeff.mat` file when simulating the RM3 float. - \[28 February 2024\]
@@ -12,7 +14,7 @@ Quick links:
 - [Tutorial](#tutorial)
 
 > [!NOTE]
-> To use the OET, a user must possess a MATLAB license and have installed the WEC-Sim Code. The documentation applies to the [latest release](https://github.com/ajay-menon-iitkgp/OET_Sys-MoDEL/releases/latest) only. Previous versions of the OET are not maintained and may be unstable on newer versions of Modelica/OpenModelica.
+> To use the OET, a user must possess a MATLAB license and have installed the WEC-Sim Code.
 
 ## About the Ocean Engineering Toolbox
 Modelica is a symbolic programming language developed by the Modelica Association :tm: that represents Cyber-physical Systems (CPS) in the time-domain. Although it has widespread applications in the automobile and aerospace industries, there is no dedicated Modelica Standard Library (MSL) for the ocean engineering community. A reason for this is the difficulty with representing frequency-dependent variables, since Modelica operates solely in the time-domain. Furthermore, the solution to convolution intergals is a significant challenge since a time history of variables cannot be accessed [\[1\]](#publications).
