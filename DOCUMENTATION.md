@@ -19,21 +19,101 @@ Modelica is a symbolic programming language developed by the Modelica Associatio
 
 The Cummins equation is selected for the OET as an appropriate frequency-dependent formulation of floating structures. The radiation and excitation forces are represented by convolution integrals and have been succesfully implemented in v0.1 and v0.2 respectively using a State-Space approach. All results are validated against the WEC-Sim time-domain solver developed in SimScape (read about WEC-Sim [here](https://github.com/WEC-Sim/WEC-Sim)).
 
-For the excitation wave, the user can select from one of four models:
-
-- Regular, uni-directional wave
-- Irregular, uni-directional wave - Pierson Moskowitz spectrum
-- Irregular, uni-directional wave - Bretschneider spectrum
-- Irregular, uni-directional wave - JONSWAP spectrum
-
-
-Repository directory:
+This GitHub repository consists of the following components:
 
 - `OET.mo` - OET library source code (Modelica)
 - `Processor.m` - Pre- and post-processing script (Matlab)
 - `DOCUMENTATION.md` - User guide (Markdown)
 - `\tutorial` - Sub-directory containing example files
 - `\Previous Versions` - Sub-directory with previous OET versions (not maintained)
+
+The OET Modelica library is broken down into packages based on functionality, each with models (i.e., components) to build a simulation. The OET directory is as follows:
+
+- <details open>
+  <summary>Ocean Engineering Toolbox</summary>
+
+  - <details>
+    <summary>Wave Profile</summary>
+
+    - <details>
+      <summary>Regular Wave</summary>
+ 
+      - LinearWave (Monochromatic linear Airy wave)
+      
+      </details>
+    
+    - <details>
+      <summary>Irregular Wave</summary>
+        
+      - PiersonMoskowitzWave (Fully-developed sea state)
+      
+      - BretschneiderWave (Modified PM spectrum for developing sea state)
+
+      - JONSWAPWave (Developing sea state with limited fetch)
+
+      </details>
+
+    </details>
+  
+  - <details>
+    <summary>Structures</summary>
+
+    - RigidBody (Solves 1DOF motion using the Cummins equation)
+
+    </details>
+  
+  - <details>
+    <summary>Internal</summary>
+      
+    - <details>
+      <summary>Functions</summary>
+ 
+      - WaveNumber (Wave number iterations from frequency and depth)
+      
+      - randomNumberGen (Random numbers through XOR shift generator)
+
+      - frequencySelector (Select wave frequencies from a range)
+
+      - spectrumGenerator_PM (Generate Pierson Moskowitz spectrum for frequency components)
+
+      - spectrumGenerator_BRT (Generate Brettschneider spectrum for frequency components)
+        
+      - spectrumGenerator_JONSWAP (Generate JONSWAP spectrum for frequency components)
+
+      </details>
+    
+    - <details>
+      <summary>Connectors</summary>
+        
+      - WaveOutConn (Output transfer wave elevation and excitation force)
+      
+      - WaveInConn (Input transfer wave elevation and excitation force)
+
+      - DataCollector (Transfer 'Rigid Body' dynamics and forces)
+
+      </details>
+    
+    - TestDevelopment (Developer component to test all models, functions, connectors)
+    
+    </details>
+  
+  - <details>
+    <summary>Tutorial</summary>
+      
+    - Sample 1 (Example model to simulate a rigid body in regular waves)
+      
+    - Sample 2 (Example model to simulate a rigid body in irregular waves)
+    
+    </details>
+  
+  - <details>
+    <summary>Simulations</summary>
+      
+    - (Directory for users to build custom simulation models)
+    
+    </details>
+    
+  </details>
 
 #### Development Team
 The OET is a research product from the Sys-MoDEL group at the University of New Brunswick (Fredericton), Canada. Current members of the development team are:
@@ -260,7 +340,7 @@ All files used in this tutorial are available in the `\tutorial` directory of th
     - Verify that the `elevationData.mat` and `exportedVariables.csv` files are in the same `$CASE` directory as the WEC-Sim simulation.
     - The remaining setup involves the standard WEC-Sim workflow - create a Simulink model `float.slx`, create the `\hydroData` sub-dir with the `rm3.h5` HDF5 file, and create the `\geometry` sub-dir with the 'float.stl' mesh file saved in it. The user can refer to the repository's `\tutorial` directory for the example setup.
 
-5. Run the WEC-Sim simulation from the `$CASE` directory by either executing the `wecSim` function on the MATLAB command line or running the `PostProcessor Script - 2 (cont'd)` section of `Processor.m`.
+5. Run the WEC-Sim simulation from the `$CASE` directory by either executing the `wecSim` function on the MATLAB command line or running the `PostProcessor Script - 2` section of `Processor.m`.
 6. Once the WEC-Sim simulation finishes, the user can plot a series of comparisons by running the `PostProcessor Script - 3` section. Sample plots are included in the `\tutorial\Validation Images` directory of this repository. Note that the final results may vary since a random wave elevation profile is generated each time. To generate repeatable waves, the user can fix the local and global seeds defined for each wave component in the OET source code.
 
 Feedback, clarifications, and issues may be brought to the attention of the development team using the 'Issues' board of this repository.
