@@ -31,7 +31,7 @@ This GitHub repository consists of the following components:
 
 The OET Modelica library is broken down into packages based on functionality, each with models (i.e., components) to build a simulation. The OET directory is as follows:
 
-- <details open>
+- <details>
   <summary>Ocean Engineering Toolbox</summary>
 
   - <details>
