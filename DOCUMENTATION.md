@@ -4,9 +4,6 @@ The Ocean Engineering Toolbox (OET) is an open-source Modelica library to simula
 
 This documentation applies to the [latest release](https://github.com/ajay-menon-iitkgp/OET_Sys-MoDEL/releases/latest) only. Previous versions of the OET are not maintained and may be unstable on newer versions of Modelica/OpenModelica.
 
-> [!WARNING]
-> The state-space BEMIO import statements in `Processor.m` are under construction. Users must manually enter the SS matrices or use the tutorial `hydroCoeff.mat` file when simulating the RM3 float. - \[28 February 2024\]
-
 Quick links:
 
 - [About the OET](#about-the-ocean-engineering-toolbox)
