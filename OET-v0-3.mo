@@ -1,4 +1,4 @@
-/*  Modelica Ocean Engineering Toolbox v0.2
+/*  Modelica Ocean Engineering Toolbox v0.3
     Copyright (C) 2024  Ajay Menon, Ali Haider, Kush Bubbar
 
     This program is free software: you can redistribute it and/or modify
@@ -561,7 +561,7 @@ package OceanEngineeringToolbox
     model TestDevelopment
       /* Model to test all wave components and WEC rigid body */
       
-      parameter String filePath = "D:/.../hydroCoeff.mat";
+      parameter String filePath = "F:/.../hydroCoeff.mat";
       OceanEngineeringToolbox.WaveProfile.RegularWave.LinearWave Reg1(fileName = filePath, Hs = 2.5, Trmp = 50);
       OceanEngineeringToolbox.WaveProfile.IrregularWave.PiersonMoskowitzWave Irr1(fileName = filePath, Hs = 2.5, n_omega = 100, Trmp = 50);
       OceanEngineeringToolbox.WaveProfile.IrregularWave.BretschneiderWave Irr2(fileName = filePath, Hs = 2.5, n_omega = 100, Trmp = 50);
@@ -589,7 +589,7 @@ package OceanEngineeringToolbox
     model sample1
       /* Single body, regular waves */
       
-      parameter String filePath = "D:/.../hydroCoeff.mat";
+      parameter String filePath = "F:/.../hydroCoeff.mat";
       OceanEngineeringToolbox.WaveProfile.RegularWave.LinearWave Reg1(fileName = filePath, Hs = 2.5, Trmp = 50);
       OceanEngineeringToolbox.Structures.RigidBody Body1(fileName = filePath);
     equation
@@ -602,14 +602,14 @@ package OceanEngineeringToolbox
     model sample2
       /* Single body, irregular waves with PM spectrum */
       
-      parameter String filePath = "D:/...hydroCoeff.mat";
+      parameter String filePath = "F:/.../hydroCoeff.mat";
       OceanEngineeringToolbox.WaveProfile.IrregularWave.PiersonMoskowitzWave PM1(fileName = filePath, Hs = 2.5, n_omega = 100, Trmp = 100);
       OceanEngineeringToolbox.Structures.RigidBody Body1(fileName = filePath);
     equation
       connect(PM1.wconn.F_exc, Body1.wconn.F_exc);
       annotation(
         Line(points = {{-40, 30}, {-20, 30}, {-20, 0}, {40, 0}, {40, 0}}),
-        experiment(StartTime = 0, StopTime = 400, Tolerance = 1e-06, Interval = 0.1));
+        experiment(StartTime = 0, StopTime = 1000, Tolerance = 1e-06, Interval = 0.1));
     end sample2;
     
   end Tutorial;
@@ -620,7 +620,7 @@ package OceanEngineeringToolbox
 
 end OceanEngineeringToolbox;
 
-/*  Modelica Ocean Engineering Toolbox (OET)
+/*  Modelica Ocean Engineering Toolbox (OET) v0.3
     Developed at:
           Sys-MoDEL, 
           University of New Brunswick, Fredericton

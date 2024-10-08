@@ -36,7 +36,7 @@ clc
 % Export required hydrodynamic coefficients from a BEMIO HDF file to a
 % MATLAB structure. This structure is then imported by the OET.
 
-% As of v0.2, the following parameters must be exported:
+% As of v0.3, the following parameters must be exported:
 % 
 %   - Total body mass (m33)
 %   - Infinite frequency added mass (Ainf33)
@@ -58,7 +58,9 @@ clc
 % all degrees of freedom, a matrix transformation removes the non-heave
 % modes for data saved as a matrix.
 
-filename = 'F:\...\rm3.h5';
+filename = 'F:\...\WEC-Sim\examples\RM3\hydroData\rm3.h5';
+% CHECK DIALOG SELECTOR
+% CHECK APP
 
 % Hydrostatics
 rho = h5read(filename,'/simulation_parameters/rho');                          % Density of water
@@ -90,15 +92,19 @@ hydroCoeff.FexcIm(1,:) = hydroCoeff.FexcIm2(:,:,3);
 % Strip rows and columns with all 0 values
 hydroCoeff.ss_rad33.A( ~any(hydroCoeff.ss_rad33.A,2), : ) = [];  % SS matrix A - rows
 hydroCoeff.ss_rad33.A( :, ~any(hydroCoeff.ss_rad33.A,1) ) = [];  % SS matrix A - columns
+hydroCoeff.ss_rad33.A = hydroCoeff.ss_rad33.A.';
 
 hydroCoeff.ss_rad33.B( ~any(hydroCoeff.ss_rad33.B,2), : ) = [];  % SS matrix B - rows
 hydroCoeff.ss_rad33.B( :, ~any(hydroCoeff.ss_rad33.B,1) ) = [];  % SS matrix B - columns
+hydroCoeff.ss_rad33.B = hydroCoeff.ss_rad33.B.';
 
 hydroCoeff.ss_rad33.C( ~any(hydroCoeff.ss_rad33.C,2), : ) = [];  % SS matrix C - rows
 hydroCoeff.ss_rad33.C( :, ~any(hydroCoeff.ss_rad33.C,1) ) = [];  % SS matrix C - columns
+hydroCoeff.ss_rad33.C = rho.*hydroCoeff.ss_rad33.C.';
 
 hydroCoeff.ss_rad33.D( ~any(hydroCoeff.ss_rad33.D,2), : ) = [];  % SS matrix D - rows
 hydroCoeff.ss_rad33.D( :, ~any(hydroCoeff.ss_rad33.D,1) ) = [];  % SS matrix D - columns
+hydroCoeff.ss_rad33.D = rho.*hydroCoeff.ss_rad33.D;
 
 % Export the MATLAB structure.
 save('hydroCoeff.mat')
@@ -182,7 +188,17 @@ wecA = output.bodies.acceleration(:,3);
 [~,uidx] = unique(M(:,1),'stable');
 M = M(uidx,:);
 
-% Figure 1 - Wave elevation profile (1,2)
+figure
+plot(wecTime,wecFrad,'-b','DisplayName','WEC-Sim');
+hold on
+plot(M(:,1),M(:,4),'--xr','DisplayName','OET','MarkerIndices',1:15:length(M(:,4)))
+hold off
+title('Radiation force comparison');
+xlabel('Time (s)');
+ylabel('Wave radiation force (N)');
+legend;
+
+%% Figure 1 - Wave elevation profile (1,2)
 f1 = figure("Name","Wave elevation profile");
 plot(elevationData(:,1),elevationData(:,2));
 title('Wave elevation profile');
@@ -278,12 +294,10 @@ savefig(f2,'output\Fig2.fig');
 saveas(f2,'output\Fig2.png');
 savefig(f3,'output\Fig3.fig');
 saveas(f3,'output\Fig3.png');
-savefig(f4,'output\Fig4.fig');
-saveas(f4,'output\Fig4.png');
 
 %% Licensing information
 
-%   Modelica Ocean Engineering Toolbox v0.2
+%   Modelica Ocean Engineering Toolbox v0.3
 %   Copyright (C) 2024  Ajay Menon, Ali Haider, Kush Bubbar
 % 
 %   This program is free software: you can redistribute it and/or modify
